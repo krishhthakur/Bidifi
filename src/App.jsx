@@ -1670,6 +1670,16 @@ function BiddersPage({
   uploadBidderDocuments,
   analyzeCompliance,
   bidderInputRef,
+  batchBidders,
+  batchResults,
+  batchLoading,
+  batchInputRefs,
+  addBatchBidder,
+  removeBatchBidder,
+  updateBatchBidderName,
+  handleBatchBidderDocuments,
+  removeBatchBidderDocument,
+  analyzeAllBids,
 }) {
   const tenderReady =
     Boolean(selectedTender);
@@ -2036,6 +2046,286 @@ function BiddersPage({
             )}
         </section>
       </div>
+
+      <section className="panel" style={{ marginTop: 20 }}>
+        <PanelHeader
+          title="Batch bid analysis"
+          description="Add up to 20 separate bidders and upload multiple evidence documents for each bidder."
+          action={
+            <button
+              className="primaryButton"
+              disabled={batchBidders.length >= 20 || batchLoading}
+              onClick={addBatchBidder}
+            >
+              <Icon name="plus" size={14} />
+              Add bidder
+            </button>
+          }
+        />
+
+        <div style={{ display: "grid", gap: 14 }}>
+          {batchBidders.map((bidder, bidderIndex) => (
+            <div
+              key={bidder.id}
+              className="selectedFiles"
+              style={{ marginTop: 0 }}
+            >
+              <div
+                className="selectedFilesHeader"
+                style={{ alignItems: "center" }}
+              >
+                <strong>
+                  Bidder {bidderIndex + 1}
+                </strong>
+
+                <span>
+                  {bidder.documents.length} docs
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  alignItems: "center",
+                  marginBottom: 12,
+                }}
+              >
+                <input
+                  value={bidder.name}
+                  onChange={(event) =>
+                    updateBatchBidderName(
+                      bidderIndex,
+                      event.target.value
+                    )
+                  }
+                  placeholder={`Bidder ${bidderIndex + 1} name`}
+                  disabled={batchLoading}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    padding: "11px 12px",
+                    border: "1px solid #dbe3f0",
+                    borderRadius: 10,
+                    outline: "none",
+                    font: "inherit",
+                    background: "#fff",
+                  }}
+                />
+
+                {batchBidders.length > 1 && (
+                  <button
+                    className="removeFile"
+                    onClick={() =>
+                      removeBatchBidder(bidderIndex)
+                    }
+                    disabled={batchLoading}
+                    title="Remove bidder"
+                  >
+                    <Icon name="close" size={14} />
+                  </button>
+                )}
+              </div>
+
+              <input
+                ref={(element) => {
+                  batchInputRefs.current[bidder.id] = element;
+                }}
+                type="file"
+                accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+                multiple
+                hidden
+                onChange={(event) =>
+                  handleBatchBidderDocuments(
+                    event,
+                    bidderIndex
+                  )
+                }
+              />
+
+              <button
+                className="bidderDropzone"
+                onClick={() =>
+                  batchInputRefs.current[bidder.id]?.click()
+                }
+                disabled={batchLoading}
+              >
+                <div className="dropzoneIcon">
+                  <Icon name="upload" size={20} />
+                </div>
+
+                <strong>
+                  Add documents for {
+                    safeText(
+                      bidder.name,
+                      `Bidder ${bidderIndex + 1}`
+                    )
+                  }
+                </strong>
+
+                <span>
+                  Multiple PDF, DOCX or TXT files are supported.
+                </span>
+
+                <small>
+                  PDF · DOCX · TXT · 25 MB per file
+                </small>
+              </button>
+
+              {bidder.documents.length > 0 && (
+                <div style={{ marginTop: 10 }}>
+                  {bidder.documents.map((file, documentIndex) => (
+                    <div
+                      className="fileRow"
+                      key={`${file.name}-${documentIndex}`}
+                    >
+                      <div className="fileRowIcon">
+                        <Icon name="file" size={15} />
+                      </div>
+
+                      <div>
+                        <strong>{file.name}</strong>
+                        <span>{formatBytes(file.size)}</span>
+                      </div>
+
+                      <button
+                        className="removeFile"
+                        onClick={() =>
+                          removeBatchBidderDocument(
+                            bidderIndex,
+                            documentIndex
+                          )
+                        }
+                        disabled={batchLoading}
+                      >
+                        <Icon name="close" size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <button
+          className="aiButton fullWidth"
+          style={{ marginTop: 16 }}
+          disabled={
+            batchLoading ||
+            !selectedTender ||
+            !requirementsReady
+          }
+          onClick={analyzeAllBids}
+        >
+          {batchLoading ? (
+            <>
+              <span className="spinner" />
+              Analyzing all bids...
+            </>
+          ) : (
+            <>
+              <Icon name="ai" size={14} />
+              Analyze All Bids
+            </>
+          )}
+        </button>
+
+        {batchResults.length > 0 && (
+          <div style={{ marginTop: 18, overflowX: "auto" }}>
+            <div
+              style={{
+                minWidth: 680,
+                border: "1px solid #e2e8f0",
+                borderRadius: 12,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "2fr .8fr .8fr 1fr 1.4fr",
+                  gap: 10,
+                  padding: "11px 14px",
+                  background: "#f8fafc",
+                  fontSize: 12,
+                  fontWeight: 800,
+                  color: "#475569",
+                }}
+              >
+                <span>Bidder</span>
+                <span>Docs</span>
+                <span>Compliance</span>
+                <span>Risk</span>
+                <span>Status</span>
+              </div>
+
+              {batchResults.map((item, index) => {
+                const itemAnalysis = item.analysis || {};
+                const compliance = clamp(
+                  normalizeNumber(
+                    itemAnalysis.compliancePercentage ??
+                      itemAnalysis.compliancePercent
+                  )
+                );
+                const risk = calculateRisk(itemAnalysis);
+                const status = item.success
+                  ? compliance >= 80
+                    ? "COMPLIANT"
+                    : compliance >= 60
+                    ? "REVIEW"
+                    : "NON_COMPLIANT"
+                  : "FAILED";
+
+                return (
+                  <div
+                    key={`${item.bidderId}-${index}`}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "2fr .8fr .8fr 1fr 1.4fr",
+                      gap: 10,
+                      alignItems: "center",
+                      padding: "13px 14px",
+                      borderTop: "1px solid #e2e8f0",
+                      fontSize: 13,
+                    }}
+                  >
+                    <strong style={{ color: "#0f172a" }}>
+                      {safeText(item.bidderName, "Unnamed Bidder")}
+                    </strong>
+                    <span>{item.documentCount}</span>
+                    <strong>{item.success ? `${Math.round(compliance)}%` : "—"}</strong>
+                    <span>{item.success ? `${risk}/100` : "—"}</span>
+                    <div>
+                      <StatusBadge status={status}>
+                        {item.success
+                          ? status === "COMPLIANT"
+                            ? "Compliant"
+                            : status === "REVIEW"
+                            ? "Review"
+                            : "Non-compliant"
+                          : "Analysis failed"}
+                      </StatusBadge>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {!selectedTender && (
+          <div className="helperText">
+            Select a tender first.
+          </div>
+        )}
+
+        {selectedTender && !requirementsReady && (
+          <div className="helperText">
+            Extract tender requirements before batch verification.
+          </div>
+        )}
+      </section>
     </>
   );
 }
@@ -3318,6 +3608,27 @@ export default function App() {
   const [bidderId, setBidderId] =
     useState(null);
 
+  /* =======================================================
+     BATCH BIDDER ANALYSIS
+  ======================================================= */
+
+  const [batchBidders, setBatchBidders] =
+    useState([
+      {
+        id: `bidder-${Date.now()}-1`,
+        name: "Bidder 1",
+        documents: [],
+      },
+    ]);
+
+  const [batchResults, setBatchResults] =
+    useState([]);
+
+  const [batchLoading, setBatchLoading] =
+    useState(false);
+
+  const batchInputRefs = useRef({});
+
   const [analysis, setAnalysis] =
     useState(null);
 
@@ -4058,6 +4369,276 @@ export default function App() {
   }
 
   /* =======================================================
+     BATCH BIDDER ANALYSIS
+  ======================================================= */
+
+  function addBatchBidder() {
+    if (batchBidders.length >= 20) {
+      showError("You can add a maximum of 20 bidders at once.");
+      return;
+    }
+
+    const nextNumber = batchBidders.length + 1;
+
+    setBatchBidders((prev) => [
+      ...prev,
+      {
+        id: `bidder-${Date.now()}-${nextNumber}`,
+        name: `Bidder ${nextNumber}`,
+        documents: [],
+      },
+    ]);
+
+    clearAlerts();
+  }
+
+  function removeBatchBidder(index) {
+    if (batchBidders.length <= 1) {
+      showError("At least one bidder is required.");
+      return;
+    }
+
+    setBatchBidders((prev) =>
+      prev.filter((_, bidderIndex) => bidderIndex !== index)
+    );
+
+    setBatchResults((prev) =>
+      prev.filter((_, bidderIndex) => bidderIndex !== index)
+    );
+  }
+
+  function updateBatchBidderName(index, value) {
+    setBatchBidders((prev) =>
+      prev.map((bidder, bidderIndex) =>
+        bidderIndex === index
+          ? { ...bidder, name: value }
+          : bidder
+      )
+    );
+  }
+
+  function handleBatchBidderDocuments(event, bidderIndex) {
+    const files = Array.from(event.target.files || []);
+    event.target.value = "";
+
+    if (!files.length) return;
+
+    const allowedExtensions = [".pdf", ".docx", ".txt"];
+    const valid = [];
+    const invalid = [];
+
+    files.forEach((file) => {
+      const lowerName = file.name.toLowerCase();
+      const validExtension = allowedExtensions.some((ext) =>
+        lowerName.endsWith(ext)
+      );
+      const validSize = file.size <= 25 * 1024 * 1024;
+
+      if (validExtension && validSize) {
+        valid.push(file);
+      } else {
+        invalid.push(file.name);
+      }
+    });
+
+    if (invalid.length) {
+      showError(
+        `Unsupported bidder document(s): ${invalid.join(", ")}`
+      );
+    }
+
+    if (valid.length) {
+      setBatchBidders((prev) =>
+        prev.map((bidder, index) =>
+          index === bidderIndex
+            ? {
+                ...bidder,
+                documents: [...bidder.documents, ...valid],
+              }
+            : bidder
+        )
+      );
+
+      setBatchResults([]);
+      clearAlerts();
+    }
+  }
+
+  function removeBatchBidderDocument(bidderIndex, documentIndex) {
+    setBatchBidders((prev) =>
+      prev.map((bidder, index) =>
+        index === bidderIndex
+          ? {
+              ...bidder,
+              documents: bidder.documents.filter(
+                (_, fileIndex) => fileIndex !== documentIndex
+              ),
+            }
+          : bidder
+      )
+    );
+
+    setBatchResults([]);
+  }
+
+  async function analyzeAllBids() {
+    if (!selectedTender?.id) {
+      showError("Please select a tender first.");
+      return;
+    }
+
+    if (!requirements.length) {
+      showError("Please extract tender requirements first.");
+      return;
+    }
+
+    const validBidders = batchBidders.filter(
+      (bidder) => bidder.documents.length > 0
+    );
+
+    if (!validBidders.length) {
+      showError("Please add documents for at least one bidder.");
+      return;
+    }
+
+    setBatchLoading(true);
+    setBatchResults([]);
+    clearAlerts();
+
+    const results = [];
+
+    try {
+      for (const bidder of validBidders) {
+        try {
+          const formData = new FormData();
+
+          bidder.documents.forEach((file) => {
+            formData.append("documents", file);
+          });
+
+          formData.append("bidderName", bidder.name || "Unnamed Bidder");
+          formData.append("tenderId", selectedTender.id);
+
+          const uploadData = await fetchJson(
+            `${API_URL}/api/upload-bidder-documents`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          const newBidderId =
+            uploadData.bidderId ||
+            uploadData.bidder?.id ||
+            uploadData.id;
+
+          if (!newBidderId) {
+            throw new Error("Bidder ID was not returned after document processing.");
+          }
+
+          const analysisData = await fetchJson(
+            `${API_URL}/api/analyze-compliance`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                tenderId: selectedTender.id,
+                bidderId: newBidderId,
+              }),
+            }
+          );
+
+          const result = parseResponseValue(analysisData);
+
+          if (
+            !result ||
+            (result.compliancePercentage === undefined &&
+              result.compliancePercent === undefined &&
+              !result.requirementsAnalysis)
+          ) {
+            throw new Error("AI returned an incomplete compliance analysis.");
+          }
+
+          const normalized = {
+            ...result,
+            bidderId: newBidderId,
+            bidderName: bidder.name || "Unnamed Bidder",
+            documentCount: bidder.documents.length,
+            compliancePercentage: clamp(
+              normalizeNumber(
+                result.compliancePercentage ?? result.compliancePercent
+              )
+            ),
+            riskScore: clamp(
+              normalizeNumber(
+                result.riskScore,
+                calculateRisk(result)
+              )
+            ),
+            requirementsAnalysis: safeArray(result.requirementsAnalysis),
+            missingDocuments: safeArray(result.missingDocuments),
+            criticalFindings: safeArray(result.criticalFindings),
+            recommendations: safeArray(result.recommendations),
+          };
+
+          results.push({
+            bidderId: newBidderId,
+            bidderName: bidder.name || "Unnamed Bidder",
+            documentCount: bidder.documents.length,
+            success: true,
+            analysis: normalized,
+          });
+
+          setBatchResults([...results]);
+        } catch (err) {
+          results.push({
+            bidderId: bidder.id,
+            bidderName: bidder.name || "Unnamed Bidder",
+            documentCount: bidder.documents.length,
+            success: false,
+            error: err.message || "Bidder analysis failed.",
+          });
+
+          setBatchResults([...results]);
+        }
+      }
+
+      const successful = results.filter((item) => item.success);
+
+      if (!successful.length) {
+        throw new Error("No bidder could be analyzed successfully.");
+      }
+
+      const best = [...successful].sort(
+        (a, b) =>
+          b.analysis.compliancePercentage -
+          a.analysis.compliancePercentage
+      )[0];
+
+      setAnalysis(best.analysis);
+      setBidderId(best.bidderId);
+      setBidderDocumentCount(best.documentCount);
+
+      showMessage(
+        `Batch analysis complete — ${successful.length} of ${validBidders.length} bidder${
+          validBidders.length === 1 ? "" : "s"
+        } analyzed successfully.`
+      );
+
+      navigate("AI Verification");
+    } catch (err) {
+      showError(
+        err.message ||
+          "Batch bidder analysis failed."
+      );
+    } finally {
+      setBatchLoading(false);
+    }
+  }
+
+  /* =======================================================
      AI COMPLIANCE ANALYSIS
   ======================================================= */
 
@@ -4389,6 +4970,36 @@ export default function App() {
               bidderInputRef={
                 bidderInputRef
               }
+              batchBidders={
+                batchBidders
+              }
+              batchResults={
+                batchResults
+              }
+              batchLoading={
+                batchLoading
+              }
+              batchInputRefs={
+                batchInputRefs
+              }
+              addBatchBidder={
+                addBatchBidder
+              }
+              removeBatchBidder={
+                removeBatchBidder
+              }
+              updateBatchBidderName={
+                updateBatchBidderName
+              }
+              handleBatchBidderDocuments={
+                handleBatchBidderDocuments
+              }
+              removeBatchBidderDocument={
+                removeBatchBidderDocument
+              }
+              analyzeAllBids={
+                analyzeAllBids
+              }
             />
           );
 
@@ -4450,6 +5061,9 @@ export default function App() {
       loading,
       analysis,
       loadingReport,
+      batchBidders,
+      batchResults,
+      batchLoading,
     ]);
 
   /* =======================================================

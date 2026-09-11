@@ -2,15 +2,6 @@
 // BIDIFI - AI BID COMPLIANCE BACKEND
 // ============================================================
 
-// IMPORTANT:
-// .env is located at:
-// C:\Users\krish\programs\bidifi\.env
-//
-// server.js is located at:
-// C:\Users\krish\programs\bidifi\src\backend\server.js
-//
-// Therefore we explicitly load ../../.env
-
 const path = require("path");
 const fs = require("fs");
 
@@ -75,6 +66,29 @@ const upload = multer({
 
   limits: {
     fileSize: 25 * 1024 * 1024,
+    files: 30,
+  },
+
+  fileFilter: (req, file, cb) => {
+    const extension = path
+      .extname(file.originalname || "")
+      .toLowerCase();
+
+    const allowed = [
+      ".pdf",
+      ".docx",
+      ".txt",
+    ];
+
+    if (!allowed.includes(extension)) {
+      return cb(
+        new Error(
+          `Unsupported file type: ${extension}. Use PDF, DOCX or TXT.`
+        )
+      );
+    }
+
+    cb(null, true);
   },
 });
 
@@ -86,9 +100,13 @@ const apiKey = process.env.OPENAI_API_KEY
   ? process.env.OPENAI_API_KEY.trim()
   : "";
 
+const OPENAI_MODEL =
+  process.env.OPENAI_MODEL?.trim() ||
+  "gpt-5.6-luna";
+
 const openai = apiKey
   ? new OpenAI({
-      apiKey: apiKey,
+      apiKey,
     })
   : null;
 
@@ -112,9 +130,9 @@ function createId(prefix = "id") {
     .substring(2, 8)}`;
 }
 
-// ------------------------------------------------------------
-// Clean extracted text
-// ------------------------------------------------------------
+// ============================================================
+// CLEAN TEXT
+// ============================================================
 
 function cleanText(text) {
   if (!text) {
@@ -130,12 +148,37 @@ function cleanText(text) {
     .trim();
 }
 
-// ------------------------------------------------------------
-// Safe array
-// ------------------------------------------------------------
+// ============================================================
+// NORMALIZE ARRAY
+// ============================================================
 
 function normalizeArray(value) {
   return Array.isArray(value) ? value : [];
+}
+
+// ============================================================
+// SAFE NUMBER
+// ============================================================
+
+function safeNumber(value, fallback = 0) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return fallback;
+  }
+
+  return number;
+}
+
+// ============================================================
+// CLAMP NUMBER
+// ============================================================
+
+function clamp(value, min, max) {
+  return Math.min(
+    max,
+    Math.max(min, value)
+  );
 }
 
 // ============================================================
@@ -157,21 +200,17 @@ function safeJsonParse(value) {
 
   let text = value.trim();
 
-  // Remove markdown fences
   text = text
     .replace(/^```json\s*/i, "")
     .replace(/^```\s*/i, "")
     .replace(/\s*```$/i, "")
     .trim();
 
-  // Direct JSON parse
   try {
     return JSON.parse(text);
   } catch (error) {}
 
-  // Find JSON object inside response
   const firstBrace = text.indexOf("{");
-
   const lastBrace = text.lastIndexOf("}");
 
   if (
@@ -193,7 +232,7 @@ function safeJsonParse(value) {
 }
 
 // ============================================================
-// DELETE TEMPORARY FILE
+// DELETE TEMP FILE
 // ============================================================
 
 function deleteFile(filePath) {
@@ -249,15 +288,11 @@ function getOpenAIErrorMessage(error) {
   }
 
   if (status === 401) {
-    return (
-      "OpenAI API key is invalid or unauthorized."
-    );
+    return "OpenAI API key is invalid or unauthorized.";
   }
 
   if (status === 403) {
-    return (
-      "OpenAI API access is forbidden for this API key."
-    );
+    return "OpenAI API access is forbidden for this API key.";
   }
 
   if (status === 404) {
@@ -267,15 +302,11 @@ function getOpenAIErrorMessage(error) {
   }
 
   if (status === 429) {
-    return (
-      "OpenAI API rate limit or quota exceeded."
-    );
+    return "OpenAI API rate limit or quota exceeded.";
   }
 
   if (status >= 500) {
-    return (
-      "OpenAI server error. Please try again."
-    );
+    return "OpenAI server error. Please try again.";
   }
 
   return (
@@ -329,10 +360,7 @@ async function extractFileContent(file) {
 
       return {
         text,
-
-        pages:
-          data.numpages || 0,
-
+        pages: data.numpages || 0,
         type: "pdf",
       };
     }
@@ -361,9 +389,7 @@ async function extractFileContent(file) {
 
       return {
         text,
-
         pages: 0,
-
         type: "docx",
       };
     }
@@ -392,9 +418,7 @@ async function extractFileContent(file) {
 
       return {
         text,
-
         pages: 0,
-
         type: "txt",
       };
     }
@@ -426,6 +450,17 @@ async function extractTenderRequirementsWithAI(
     );
   }
 
+  const MAX_TENDER_CHARS = 120000;
+
+  const finalTenderText =
+    tenderText.length >
+    MAX_TENDER_CHARS
+      ? tenderText.substring(
+          0,
+          MAX_TENDER_CHARS
+        )
+      : tenderText;
+
   console.log("");
   console.log(
     "=============================================="
@@ -436,45 +471,11 @@ async function extractTenderRequirementsWithAI(
   console.log(
     "=============================================="
   );
-
-  console.log(
-    "File:",
-    filename
-  );
-
+  console.log("File:", filename);
   console.log(
     "Text length:",
-    tenderText.length
+    finalTenderText.length
   );
-
-  console.log(
-    "=============================================="
-  );
-
-  // Keep request within reasonable size
-  const MAX_TENDER_CHARS = 120000;
-
-  let finalTenderText =
-    tenderText;
-
-  if (
-    tenderText.length >
-    MAX_TENDER_CHARS
-  ) {
-    console.log(
-      `Tender text truncated from ${tenderText.length} to ${MAX_TENDER_CHARS} characters.`
-    );
-
-    finalTenderText =
-      tenderText.substring(
-        0,
-        MAX_TENDER_CHARS
-      );
-  }
-
-  // ==========================================================
-  // PROMPT
-  // ==========================================================
 
   const prompt = `
 You are BIDIFI, an expert AI government procurement
@@ -482,13 +483,13 @@ and tender compliance analyst.
 
 Analyze the tender document below.
 
-Your objective is to identify ALL meaningful requirements
-that a bidder must satisfy.
+Identify ALL meaningful requirements that a bidder
+must satisfy.
 
-Do not rely only on keywords.
 Understand the actual meaning of the tender.
+Do not rely only on keywords.
 
-Look for requirements involving:
+Look for:
 
 - Eligibility
 - Company registration
@@ -533,16 +534,16 @@ IMPORTANT:
 
 1. Do not invent requirements.
 2. Only use information present in the tender.
-3. Preserve important numbers, dates, thresholds and conditions.
-4. If a requirement has a financial threshold, include it.
-5. If a requirement has a date, include it.
-6. If a requirement has a quantity, include it.
-7. If a requirement has a technical specification, include it.
-8. Identify documents/evidence needed to prove each requirement.
+3. Preserve important numbers.
+4. Preserve dates.
+5. Preserve thresholds.
+6. Preserve quantities.
+7. Preserve technical specifications.
+8. Identify evidence needed to prove each requirement.
 9. Include conditional requirements.
 10. Include important commercial and contractual conditions.
-11. If something is unclear, explain it instead of guessing.
-12. sourceText must be a short relevant excerpt from the tender.
+11. If something is unclear, explain it.
+12. sourceText must come from the tender.
 
 Return ONLY valid JSON.
 
@@ -575,65 +576,18 @@ Tender document:
 ${finalTenderText}
 `;
 
-  // ==========================================================
-  // OPENAI REQUEST
-  // ==========================================================
-
   let response;
 
   try {
-    console.log(
-      "Sending tender to OpenAI..."
-    );
-
     response =
       await openai.responses.create({
-        model: "gpt-5.6-luna",
+        model: OPENAI_MODEL,
         input: prompt,
       });
-
-    console.log(
-      "OpenAI request completed."
-    );
   } catch (error) {
-    console.error("");
     console.error(
-      "=============================================="
-    );
-    console.error(
-      "OPENAI API ERROR"
-    );
-    console.error(
-      "=============================================="
-    );
-
-    console.error(
-      "Name:",
-      error?.name
-    );
-
-    console.error(
-      "Message:",
-      error?.message
-    );
-
-    console.error(
-      "Status:",
-      error?.status
-    );
-
-    console.error(
-      "Code:",
-      error?.code
-    );
-
-    console.error(
-      "Type:",
-      error?.type
-    );
-
-    console.error(
-      "=============================================="
+      "OPENAI REQUIREMENT ERROR:",
+      error
     );
 
     throw new Error(
@@ -641,21 +595,8 @@ ${finalTenderText}
     );
   }
 
-  // ==========================================================
-  // READ RESPONSE
-  // ==========================================================
-
   const output =
     response?.output_text || "";
-
-  console.log(
-    "AI response received."
-  );
-
-  console.log(
-    "AI output length:",
-    output.length
-  );
 
   if (!output) {
     throw new Error(
@@ -663,19 +604,12 @@ ${finalTenderText}
     );
   }
 
-  // ==========================================================
-  // PARSE JSON
-  // ==========================================================
-
   const parsed =
     safeJsonParse(output);
 
   if (!parsed) {
     console.error(
-      "AI RAW OUTPUT:"
-    );
-
-    console.error(
+      "AI RAW OUTPUT:",
       output.substring(0, 5000)
     );
 
@@ -684,17 +618,10 @@ ${finalTenderText}
     );
   }
 
-  // ==========================================================
-  // NORMALIZE RESULT
-  // ==========================================================
-
-  if (
-    !Array.isArray(
+  parsed.requirements =
+    normalizeArray(
       parsed.requirements
-    )
-  ) {
-    parsed.requirements = [];
-  }
+    );
 
   parsed.requirements =
     parsed.requirements.map(
@@ -747,21 +674,313 @@ ${finalTenderText}
     parsed.requirements.length
   );
 
-  console.log(
-    "=============================================="
-  );
-
-  console.log(
-    "AI EXTRACTION COMPLETED"
-  );
-
-  console.log(
-    "=============================================="
-  );
-
-  console.log("");
-
   return parsed;
+}
+
+// ============================================================
+// CALCULATE COMPLIANCE
+// ============================================================
+
+function calculateCompliance(
+  requirements,
+  requirementsAnalysis
+) {
+  const reqs =
+    normalizeArray(requirements);
+
+  const analyses =
+    normalizeArray(
+      requirementsAnalysis
+    );
+
+  if (reqs.length === 0) {
+    return {
+      compliancePercentage: 0,
+      statusCounts: {},
+    };
+  }
+
+  const analysisMap = new Map();
+
+  for (const item of analyses) {
+    if (
+      item?.requirementId
+    ) {
+      analysisMap.set(
+        item.requirementId,
+        item
+      );
+    }
+  }
+
+  let compliantPoints = 0;
+  let applicableRequirements = 0;
+
+  const statusCounts = {};
+
+  for (const requirement of reqs) {
+    const analysis =
+      analysisMap.get(
+        requirement.id
+      );
+
+    const status =
+      String(
+        analysis?.status ||
+          "MISSING"
+      ).toUpperCase();
+
+    statusCounts[status] =
+      (statusCounts[status] || 0) + 1;
+
+    if (
+      status ===
+      "NOT_APPLICABLE"
+    ) {
+      continue;
+    }
+
+    applicableRequirements++;
+
+    if (
+      status ===
+      "COMPLIANT"
+    ) {
+      compliantPoints++;
+    }
+  }
+
+  const compliancePercentage =
+    applicableRequirements === 0
+      ? 0
+      : Math.round(
+          (compliantPoints /
+            applicableRequirements) *
+            100
+        );
+
+  return {
+    compliancePercentage:
+      clamp(
+        compliancePercentage,
+        0,
+        100
+      ),
+
+    statusCounts,
+  };
+}
+
+// ============================================================
+// CALCULATE RISK
+// ============================================================
+
+function calculateRiskScore(
+  requirements,
+  requirementsAnalysis,
+  existingRiskScore = 0
+) {
+  const reqs =
+    normalizeArray(requirements);
+
+  const analyses =
+    normalizeArray(
+      requirementsAnalysis
+    );
+
+  let score = 0;
+
+  const mandatoryIds =
+    new Set(
+      reqs
+        .filter(
+          (r) =>
+            r &&
+            r.mandatory === true
+        )
+        .map(
+          (r) => r.id
+        )
+    );
+
+  for (const item of analyses) {
+    const status =
+      String(
+        item?.status || ""
+      ).toUpperCase();
+
+    const isMandatory =
+      mandatoryIds.has(
+        item?.requirementId
+      );
+
+    if (
+      status ===
+      "NON_COMPLIANT"
+    ) {
+      score +=
+        isMandatory
+          ? 15
+          : 8;
+    }
+
+    if (
+      status ===
+      "MISSING"
+    ) {
+      score +=
+        isMandatory
+          ? 14
+          : 6;
+    }
+
+    if (
+      status ===
+      "EXPIRED"
+    ) {
+      score +=
+        isMandatory
+          ? 12
+          : 5;
+    }
+
+    if (
+      status ===
+      "MISMATCH"
+    ) {
+      score +=
+        isMandatory
+          ? 13
+          : 7;
+    }
+
+    if (
+      status ===
+      "INCONSISTENT"
+    ) {
+      score +=
+        isMandatory
+          ? 10
+          : 5;
+    }
+
+    if (
+      status ===
+      "NEEDS_HUMAN_REVIEW"
+    ) {
+      score +=
+        isMandatory
+          ? 5
+          : 2;
+    }
+  }
+
+  const aiScore =
+    safeNumber(
+      existingRiskScore,
+      0
+    );
+
+  // Use AI score as a supporting signal,
+  // not as the only source.
+  score =
+    Math.round(
+      (score * 0.75) +
+        (aiScore * 0.25)
+    );
+
+  return clamp(
+    score,
+    0,
+    100
+  );
+}
+
+// ============================================================
+// RISK LEVEL
+// ============================================================
+
+function getRiskLevel(score) {
+  if (score >= 70) {
+    return "HIGH";
+  }
+
+  if (score >= 40) {
+    return "MEDIUM";
+  }
+
+  return "LOW";
+}
+
+// ============================================================
+// OVERALL DECISION
+// ============================================================
+
+function calculateOverallDecision(
+  requirements,
+  requirementsAnalysis
+) {
+  const reqs =
+    normalizeArray(requirements);
+
+  const analyses =
+    normalizeArray(
+      requirementsAnalysis
+    );
+
+  const mandatoryIds =
+    new Set(
+      reqs
+        .filter(
+          (r) =>
+            r &&
+            r.mandatory === true
+        )
+        .map(
+          (r) => r.id
+        )
+    );
+
+  let mandatoryFailure = false;
+  let anyFailure = false;
+
+  for (const item of analyses) {
+    const status =
+      String(
+        item?.status || ""
+      ).toUpperCase();
+
+    const isMandatory =
+      mandatoryIds.has(
+        item?.requirementId
+      );
+
+    if (
+      [
+        "NON_COMPLIANT",
+        "MISSING",
+        "EXPIRED",
+        "MISMATCH",
+        "INCONSISTENT",
+      ].includes(status)
+    ) {
+      anyFailure = true;
+
+      if (isMandatory) {
+        mandatoryFailure = true;
+      }
+    }
+  }
+
+  if (mandatoryFailure) {
+    return "NON_COMPLIANT";
+  }
+
+  if (anyFailure) {
+    return "PARTIALLY_COMPLIANT";
+  }
+
+  return "COMPLIANT";
 }
 
 // ============================================================
@@ -800,11 +1019,9 @@ async function analyzeBidderDocumentsWithAI(
   console.log(
     "=============================================="
   );
-
   console.log(
     "AI COMPLIANCE ANALYSIS STARTED"
   );
-
   console.log(
     "=============================================="
   );
@@ -844,6 +1061,9 @@ Evidence Needed:
 ${normalizeArray(
   r.evidenceNeeded
 ).join(", ")}
+
+Tender Source:
+${r.sourceText || "Not provided"}
 `
       )
       .join("\n");
@@ -952,39 +1172,26 @@ INCONSISTENT:
 Different bidder documents contain contradictory information.
 
 NEEDS_HUMAN_REVIEW:
-Evidence is ambiguous or insufficient for a reliable automated decision.
+Evidence is ambiguous or insufficient.
 
 NOT_APPLICABLE:
 The requirement condition does not apply.
 
 IMPORTANT:
 
-Do not invent facts.
-
-If information is not found,
-say "Not found in submitted documents."
-
-Every decision should contain evidence whenever
-evidence exists.
-
-Calculate compliancePercentage from actual
-requirements, not number of documents.
-
-riskScore:
-
-0 = very low risk
-100 = extremely high risk
-
-Consider:
-
-- Missing mandatory requirements
-- Failed financial thresholds
-- Technical mismatch
-- Expired certificates
-- Identity mismatch
-- Contradictory information
-- Missing mandatory forms
-- Serious contractual/commercial failures
+- Never invent facts.
+- If information is not found, say:
+  "Not found in submitted documents."
+- Evidence must come from bidder documents.
+- Include the exact filename whenever possible.
+- Keep excerpts short.
+- Compare numbers carefully.
+- Compare dates carefully.
+- Compare company names carefully.
+- Treat mandatory requirements seriously.
+- If a requirement is conditional and the condition is not triggered,
+  use NOT_APPLICABLE.
+- Confidence must be between 0 and 100.
 
 Return ONLY valid JSON.
 
@@ -1067,10 +1274,6 @@ BIDDER DOCUMENTS:
 ${finalDocumentText}
 `;
 
-  // ==========================================================
-  // OPENAI
-  // ==========================================================
-
   let response;
 
   try {
@@ -1080,7 +1283,7 @@ ${finalDocumentText}
 
     response =
       await openai.responses.create({
-        model: "gpt-5.6-luna",
+        model: OPENAI_MODEL,
         input: prompt,
       });
 
@@ -1088,41 +1291,9 @@ ${finalDocumentText}
       "Compliance AI response received."
     );
   } catch (error) {
-    console.error("");
     console.error(
-      "=============================================="
-    );
-
-    console.error(
-      "OPENAI COMPLIANCE API ERROR"
-    );
-
-    console.error(
-      "=============================================="
-    );
-
-    console.error(
-      "Message:",
-      error?.message
-    );
-
-    console.error(
-      "Status:",
-      error?.status
-    );
-
-    console.error(
-      "Code:",
-      error?.code
-    );
-
-    console.error(
-      "Type:",
-      error?.type
-    );
-
-    console.error(
-      "=============================================="
+      "OPENAI COMPLIANCE ERROR:",
+      error
     );
 
     throw new Error(
@@ -1144,10 +1315,7 @@ ${finalDocumentText}
 
   if (!parsed) {
     console.error(
-      "AI COMPLIANCE RAW OUTPUT:"
-    );
-
-    console.error(
+      "AI COMPLIANCE RAW OUTPUT:",
       output.substring(0, 5000)
     );
 
@@ -1157,8 +1325,15 @@ ${finalDocumentText}
   }
 
   // ==========================================================
-  // NORMALIZE ARRAYS
+  // NORMALIZE RESULT
   // ==========================================================
+
+  parsed.bidderSummary =
+    parsed.bidderSummary &&
+    typeof parsed.bidderSummary ===
+      "object"
+      ? parsed.bidderSummary
+      : {};
 
   parsed.requirementsAnalysis =
     normalizeArray(
@@ -1185,9 +1360,142 @@ ${finalDocumentText}
       parsed.recommendations
     );
 
+  // ==========================================================
+  // NORMALIZE REQUIREMENT ANALYSIS
+  // ==========================================================
+
+  parsed.requirementsAnalysis =
+    parsed.requirementsAnalysis.map(
+      (item) => {
+        const status =
+          String(
+            item?.status ||
+              "NEEDS_HUMAN_REVIEW"
+          ).toUpperCase();
+
+        return {
+          requirementId:
+            item?.requirementId ||
+            "",
+
+          category:
+            item?.category ||
+            "General",
+
+          requirementTitle:
+            item?.requirementTitle ||
+            "",
+
+          status,
+
+          compliant:
+            status ===
+            "COMPLIANT",
+
+          severity:
+            item?.severity ||
+            (
+              status ===
+              "COMPLIANT"
+                ? "LOW"
+                : "MEDIUM"
+            ),
+
+          evidence:
+            normalizeArray(
+              item?.evidence
+            ),
+
+          comparison:
+            item?.comparison ||
+            "",
+
+          reason:
+            item?.reason ||
+            "",
+
+          confidence:
+            clamp(
+              safeNumber(
+                item?.confidence,
+                0
+              ),
+              0,
+              100
+            ),
+        };
+      }
+    );
+
+  // ==========================================================
+  // CALCULATE REAL COMPLIANCE
+  // ==========================================================
+
+  const compliance =
+    calculateCompliance(
+      requirements,
+      parsed.requirementsAnalysis
+    );
+
+  // ==========================================================
+  // CALCULATE REAL RISK
+  // ==========================================================
+
+  const riskScore =
+    calculateRiskScore(
+      requirements,
+      parsed.requirementsAnalysis,
+      parsed.riskScore
+    );
+
+  // ==========================================================
+  // CALCULATE DECISION
+  // ==========================================================
+
+  const overallDecision =
+    calculateOverallDecision(
+      requirements,
+      parsed.requirementsAnalysis
+    );
+
+  const riskLevel =
+    getRiskLevel(
+      riskScore
+    );
+
+  parsed.compliancePercentage =
+    compliance.compliancePercentage;
+
+  parsed.riskScore =
+    riskScore;
+
+  parsed.riskLevel =
+    riskLevel;
+
+  parsed.overallDecision =
+    overallDecision;
+
+  parsed.statusCounts =
+    compliance.statusCounts;
+
   console.log(
-    "Compliance requirements analyzed:",
-    parsed.requirementsAnalysis.length
+    "Compliance:",
+    parsed.compliancePercentage + "%"
+  );
+
+  console.log(
+    "Risk score:",
+    parsed.riskScore
+  );
+
+  console.log(
+    "Risk level:",
+    parsed.riskLevel
+  );
+
+  console.log(
+    "Decision:",
+    parsed.overallDecision
   );
 
   console.log(
@@ -1201,8 +1509,6 @@ ${finalDocumentText}
   console.log(
     "=============================================="
   );
-
-  console.log("");
 
   return parsed;
 }
@@ -1221,6 +1527,9 @@ app.get("/", (req, res) => {
       "AI Bid Compliance Backend is running.",
 
     port: PORT,
+
+    model:
+      OPENAI_MODEL,
   });
 });
 
@@ -1243,6 +1552,9 @@ app.get(
         apiKey
           ? "CONNECTED"
           : "NOT_CONFIGURED",
+
+      model:
+        OPENAI_MODEL,
 
       envFile:
         envPath,
@@ -1353,10 +1665,6 @@ app.post(
           console.log(
             `Tender uploaded: ${file.originalname}`
           );
-
-          console.log(
-            `Extracted text: ${content.text.length} characters`
-          );
         } catch (error) {
           console.error(
             "Tender file error:",
@@ -1458,8 +1766,6 @@ app.post(
         tender
       );
 
-      console.log("");
-
       console.log(
         "TENDER UPLOAD SUCCESS"
       );
@@ -1473,18 +1779,6 @@ app.post(
         "Tender ID:",
         tender.id
       );
-
-      console.log(
-        "Pages:",
-        tender.pages
-      );
-
-      console.log(
-        "Text length:",
-        tender.text.length
-      );
-
-      console.log("");
 
       return res.json({
         success: true,
@@ -1533,43 +1827,12 @@ app.post(
   "/api/extract-requirements",
 
   async (req, res) => {
-    console.log("");
-
-    console.log(
-      "=============================================="
-    );
-
-    console.log(
-      "EXTRACT REQUIREMENTS REQUEST"
-    );
-
-    console.log(
-      "=============================================="
-    );
-
     try {
       const {
         tenderId,
         tenderName,
         text,
       } = req.body || {};
-
-      console.log(
-        "Tender ID:",
-        tenderId ||
-          "NOT PROVIDED"
-      );
-
-      console.log(
-        "Tender Name:",
-        tenderName ||
-          "NOT PROVIDED"
-      );
-
-      console.log(
-        "Request text length:",
-        text?.length || 0
-      );
 
       let tender = null;
 
@@ -1585,10 +1848,6 @@ app.post(
           tenderStore.get(
             tenderId
           );
-
-        console.log(
-          "Tender found by ID."
-        );
       }
 
       // ======================================================
@@ -1610,15 +1869,8 @@ app.post(
               tenderName
           ) {
             tender = item;
-
             break;
           }
-        }
-
-        if (tender) {
-          console.log(
-            "Tender found by name."
-          );
         }
       }
 
@@ -1656,15 +1908,6 @@ app.post(
         tenderName ||
         "Tender Document";
 
-      console.log(
-        "Final tender text length:",
-        tenderText.length
-      );
-
-      console.log(
-        "Starting AI extraction..."
-      );
-
       // ======================================================
       // AI
       // ======================================================
@@ -1690,19 +1933,7 @@ app.post(
           tender.id,
           tender
         );
-
-        console.log(
-          "AI requirements saved to tender."
-        );
       }
-
-      console.log(
-        "Extraction request successful."
-      );
-
-      console.log(
-        "=============================================="
-      );
 
       return res.json({
         success: true,
@@ -1713,52 +1944,9 @@ app.post(
         ...aiResult,
       });
     } catch (error) {
-      console.error("");
-
       console.error(
-        "=============================================="
-      );
-
-      console.error(
-        "REQUIREMENT EXTRACTION FAILED"
-      );
-
-      console.error(
-        "=============================================="
-      );
-
-      console.error(
-        "Name:",
-        error?.name
-      );
-
-      console.error(
-        "Message:",
-        error?.message
-      );
-
-      console.error(
-        "Status:",
-        error?.status
-      );
-
-      console.error(
-        "Code:",
-        error?.code
-      );
-
-      console.error(
-        "Type:",
-        error?.type
-      );
-
-      console.error(
-        "Stack:",
-        error?.stack
-      );
-
-      console.error(
-        "=============================================="
+        "Requirement extraction failed:",
+        error
       );
 
       return res.status(500).json({
@@ -1905,6 +2093,19 @@ app.post(
       }
     }
 
+    if (
+      documents.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+
+        message:
+          "None of the bidder documents could be read.",
+
+        errors,
+      });
+    }
+
     bidderStore.set(
       bidderId,
       {
@@ -2038,9 +2239,14 @@ app.post(
       }
 
       console.log("");
-
       console.log(
-        `Starting compliance analysis: ${tender.name}`
+        "=============================================="
+      );
+      console.log(
+        "STARTING BID COMPLIANCE ANALYSIS"
+      );
+      console.log(
+        "=============================================="
       );
 
       const result =
@@ -2230,7 +2436,7 @@ app.get(
 );
 
 // ============================================================
-// EXPLICIT GET ERROR FOR EXTRACT REQUIREMENTS
+// EXPLICIT GET ERROR
 // ============================================================
 
 app.get(
@@ -2243,6 +2449,43 @@ app.get(
       message:
         "This endpoint requires POST. Do not open /api/extract-requirements directly in the browser.",
     });
+  }
+);
+
+// ============================================================
+// MULTER / FILE ERROR HANDLER
+// ============================================================
+
+app.use(
+  (error, req, res, next) => {
+    if (
+      error instanceof
+      multer.MulterError
+    ) {
+      return res.status(400).json({
+        success: false,
+
+        message:
+          `Upload error: ${error.message}`,
+      });
+    }
+
+    if (
+      error &&
+      error.message &&
+      error.message.startsWith(
+        "Unsupported file type"
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+
+        message:
+          error.message,
+      });
+    }
+
+    next(error);
   }
 );
 
@@ -2335,7 +2578,10 @@ app.listen(
       }`
     );
 
-    // Never print the actual API key
+    console.log(
+      `AI Model: ${OPENAI_MODEL}`
+    );
+
     console.log(
       `API key loaded: ${
         apiKey ? "YES" : "NO"
