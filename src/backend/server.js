@@ -13748,52 +13748,56 @@ console.log(
   `[DEBUG SERVER] About to start app.listen on 0.0.0.0:${PORT}`
 );
 
-const server = app.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
-    console.log(
-      "[DEBUG SERVER] LISTEN CALLBACK FIRED"
-    );
+if (require.main === module) {
+  const server = app.listen(
+    PORT,
+    "0.0.0.0",
+    () => {
+      console.log(
+        "[DEBUG SERVER] LISTEN CALLBACK FIRED"
+      );
 
-    console.log(
-      "============================================================"
-    );
+      console.log(
+        "============================================================"
+      );
 
-    console.log(
-      "BIDIFI AI BID COMPLIANCE ENGINE"
-    );
+      console.log(
+        "BIDIFI AI BID COMPLIANCE ENGINE"
+      );
 
-    console.log(
-      `Backend running on http://localhost:${PORT}`
-    );
+      console.log(
+        `Backend running on http://localhost:${PORT}`
+      );
 
-    console.log(
-      `AI: ${
-        apiKey && openai
-          ? `enabled (${OPENAI_MODEL})`
-          : "not configured — deterministic engine active"
-      }`
-    );
+      console.log(
+        `AI: ${
+          apiKey && openai
+            ? `enabled (${OPENAI_MODEL})`
+            : "not configured — deterministic engine active"
+        }`
+      );
 
-    console.log(
-      "Evidence mode: STRICT BIDDER-DOCUMENT ONLY"
-    );
+      console.log(
+        "Evidence mode: STRICT BIDDER-DOCUMENT ONLY"
+      );
 
-    console.log(
-      "Requirement matching: REQUIREMENT-SPECIFIC"
-    );
+      console.log(
+        "Requirement matching: REQUIREMENT-SPECIFIC"
+      );
 
-    console.log(
-      "Partial evidence: REVIEW / NON_COMPLIANT"
-    );
+      console.log(
+        "Partial evidence: REVIEW / NON_COMPLIANT"
+      );
 
-    console.log(
-      "Tender echo protection: ENABLED"
-    );
+      console.log(
+        "Tender echo protection: ENABLED"
+      );
 
-    console.log(
-      "============================================================"
-    );
-  }
-);
+      console.log(
+        "============================================================"
+      );
+    }
+  );
+}
+
+module.exports = app;

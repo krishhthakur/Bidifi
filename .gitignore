@@ -24,3 +24,11 @@ dist-ssr
 *.sw?
 .env
 src/backend/uploads/
+# BIDIFI local/generated data
+data/
+src/backend/data/
+
+# Local backup files
+*.backup
+*_BACKUP.js
+*_backup*.js
