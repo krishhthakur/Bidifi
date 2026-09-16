@@ -1,4 +1,4 @@
-﻿module.exports = function handler(req, res) {
+﻿export default function handler(req, res) {
   const results = {};
 
   const modules = [
@@ -29,4 +29,4 @@
     node: process.version,
     modules: results
   });
-};
+}
