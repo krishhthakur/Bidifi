@@ -32,3 +32,6 @@ src/backend/data/
 *.backup
 *_BACKUP.js
 *_backup*.js
+
+.vercel
+.env*
