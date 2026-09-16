@@ -1,4 +1,8 @@
-﻿export default function handler(req, res) {
+﻿import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+
+export default function handler(req, res) {
   const results = {};
 
   const modules = [
