@@ -6756,7 +6756,9 @@ export default function App() {
                 selectedTender.name ||
                 selectedTender.filename ||
                 "",
-              text: "",
+              text:
+                selectedTender.text ||
+                "",
             }),
           }
         );
