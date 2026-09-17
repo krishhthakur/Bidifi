@@ -10414,3 +10414,351 @@ html body .app .topbar .searchBox input::placeholder {
   -webkit-text-fill-color: #94a3b8 !important;
   opacity: 1 !important;
 }
+/* =========================================================
+   BIDIFI HOME HERO — FORCE CENTER
+   ========================================================= */
+
+/* Hero ke andar jis block me ye exact heading hai */
+.home:has(h1:is(:where(*))) h1,
+main:has(h1:is(:where(*))) h1 {
+  text-align: center !important;
+}
+
+/* Exact text block ko center karna */
+h1:has(+ *),
+h1 {
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+/* Home ke main content ko center */
+main {
+  position: relative !important;
+}
+
+main > div {
+  position: relative;
+}
+
+/* Heading */
+main h1 {
+  text-align: center !important;
+  font-size: 58px !important;
+  line-height: 1.08 !important;
+  font-weight: 800 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Subtitle / supporting text */
+main h1 ~ p {
+  text-align: center !important;
+  font-size: 20px !important;
+  line-height: 1.6 !important;
+  max-width: 850px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Any direct text container around hero */
+main h1,
+main h1 ~ *,
+main h1 + div,
+main h1 + p {
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  main h1 {
+    font-size: 44px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  main h1 {
+    font-size: 34px !important;
+  }
+
+  main h1 ~ p {
+    font-size: 16px !important;
+  }
+}
+/* Start verification + View reports — tiny left shift */
+main div:has(button) {
+  transform: translateX(-8px) !important;
+}
+/* =========================================================
+   BIDIFI HOME — FINAL FIX
+   1. Description BLACK
+   2. Home page proper vertical scrolling
+   3. Old Portal sticky animation disabled
+   ========================================================= */
+
+/* ---------- TEXT BLACK ---------- */
+
+.publicHome .heroSubtitle,
+.publicHome .heroSubtitle *,
+.publicHome .hero-description,
+.publicHome .hero-description * {
+  color: #000000 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+
+/* ---------- NORMAL PAGE SCROLL ---------- */
+
+html,
+body,
+#root {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.app {
+  min-height: 100vh !important;
+}
+
+
+/* ---------- HOME PAGE ---------- */
+
+.dashboardHomePage,
+.dashboardHomePage * {
+  max-height: none;
+}
+
+.dashboardHomePage {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+}
+
+
+/* ---------- NEW GHIBLI HERO ---------- */
+
+.dashboardHomePage .ghibliBidifiHero {
+  position: relative !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+
+/* ---------- REMOVE OLD PORTAL STICKY BEHAVIOUR ---------- */
+
+.dashboardHomePage .portalHeroSection {
+  position: relative !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+.dashboardHomePage .portalHeroStage {
+  position: relative !important;
+  top: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+
+
+/* ---------- CONTENT AFTER HERO ---------- */
+
+.dashboardHomePage .statsGrid {
+  position: relative !important;
+  z-index: 2 !important;
+  margin-top: 0 !important;
+}
+
+
+/* ---------- PREVENT OLD ANIMATION FROM BLOCKING SCROLL ---------- */
+
+.portalHeroSection,
+.portalHeroStage {
+  pointer-events: auto;
+}
+
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 760px) {
+  .dashboardHomePage .ghibliBidifiHero {
+    min-height: 100svh !important;
+    height: auto !important;
+  }
+
+  html,
+  body {
+    overflow-y: auto !important;
+  }
+}
+html body .ghibliBidifiHero .ghibliBidifiHeroCopy > p {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+.ghibliBidifiHero .ghibliHeroFlow {
+  font-size: 15px !important;
+}
+
+.ghibliBidifiHero .ghibliHeroFlow b {
+  font-size: 15px !important;
+}
+.dashboardHomePage .pageHeader {
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.dashboardHomePage .pageHeader > div:first-child {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.dashboardHomePage .pageHeader h1,
+.dashboardHomePage .pageHeader p {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.dashboardHomePage .pageHeader p {
+  max-width: 850px !important;
+}
+/* BIDIFI PORTAL TOP-LEFT OVERRIDE */
+.portalHeroStage .portalCornerTop > span:first-child {
+  color: #fff !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+.portalHeroStage .portalCornerTop > span:first-child svg {
+  color: #67e8f9 !important;
+  stroke: #67e8f9 !important;
+}
+
+.portalHeroStage .portalCornerTop > span:last-child {
+  color: #67e8f9 !important;
+  -webkit-text-fill-color: #67e8f9 !important;
+  font-weight: 800 !important;
+}
+/* =========================================================
+   BIDIFI — WORKSPACE PAGE HEADERS
+   EXACT PAGEHEADER OVERRIDE
+   ========================================================= */
+
+/* Main PageHeader layout */
+.pageHeader {
+  width: 100% !important;
+}
+
+/* Center the complete header content */
+.pageHeader > div:first-child {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+}
+
+/* Eyebrow */
+.pageHeader .pageEyebrow {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+
+  color: #7c3aed !important;
+  letter-spacing: 0.16em !important;
+  font-weight: 800 !important;
+}
+
+/* Main title */
+.pageHeader h1 {
+  width: 100% !important;
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  background: linear-gradient(
+    90deg,
+    #7c3aed 0%,
+    #2563eb 50%,
+    #0891b2 100%
+  ) !important;
+
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Description */
+.pageHeader > div:first-child > p {
+  width: min(760px, 100%) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  text-align: center !important;
+  color: #64748b !important;
+  line-height: 1.65 !important;
+}
+
+/* =========================================================
+   KEEP ACTION BUTTONS FROM BREAKING CENTER ALIGNMENT
+   ========================================================= */
+
+.pageHeader > div:last-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+@media (min-width: 769px) {
+  .pageHeader {
+    align-items: center !important;
+  }
+
+  .pageHeader > div:first-child {
+    text-align: center !important;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .pageHeader {
+    text-align: center !important;
+  }
+
+  .pageHeader > div:first-child {
+    width: 100% !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .pageHeader h1,
+  .pageHeader .pageEyebrow,
+  .pageHeader > div:first-child > p {
+    text-align: center !important;
+  }
+
+  .pageHeader > div:first-child > p {
+    width: 94% !important;
+  }
+}
