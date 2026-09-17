@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD
-    ? window.location.origin
-    : "http://localhost:5000");
+const configuredApiUrl = String(import.meta.env.VITE_API_URL || "").trim();
+const API_URL = configuredApiUrl
+  ? configuredApiUrl.replace(/\/$/, "")
+  : (import.meta.env.PROD
+      ? window.location.origin
+      : "http://localhost:5000");
 
 /* =========================================================================
    BIDIFI FRONTEND — FILE MAP / NOTES
@@ -1080,6 +1081,11 @@ async function fetchJson(url, options = {}) {
   try {
     data = text ? JSON.parse(text) : {};
   } catch {
+    if (import.meta.env.PROD && response.status >= 500) {
+      throw new Error(
+        `BIDIFI backend returned HTTP ${response.status}. Check the deployed backend URL and server logs.`
+      );
+    }
     throw new Error(`Server returned an invalid response (${response.status}).`);
   }
 
@@ -1896,7 +1902,7 @@ function Sidebar({
   return (
     <aside
       className={`sidebar ${
-        mobileMenu ? "open" : ""
+        mobileMenu ? "open mobileOpen" : ""
       }`}
     >
       <div className="sidebarTop">

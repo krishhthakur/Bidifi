@@ -107,10 +107,14 @@
        BIDIFI RECOMMENDATION FEEDBACK - DIRECT STORAGE
        ============================================================ */
 
+    const FEEDBACK_ROOT =
+      process.env.VERCEL
+        ? path.join("/tmp", "bidifi-data")
+        : path.join(__dirname, "data");
+
     const FEEDBACK_FILE =
       path.join(
-        __dirname,
-        "data",
+        FEEDBACK_ROOT,
         "recommendation_feedback.json"
       );
 
@@ -355,11 +359,16 @@
     const ROOT_DIR =
       __dirname;
 
+    // Vercel/serverless filesystems are read-only outside /tmp.
+    // Keep the normal project data directory for local/long-running servers,
+    // but use /tmp when this process is executed in Vercel.
+    const RUNTIME_DATA_ROOT =
+      process.env.VERCEL
+        ? path.join("/tmp", "bidifi-data")
+        : path.join(ROOT_DIR, "data");
+
     const DATA_DIR =
-      path.join(
-        ROOT_DIR,
-        "data"
-      );
+      RUNTIME_DATA_ROOT;
 
     const UPLOAD_DIR =
       path.join(

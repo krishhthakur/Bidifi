@@ -4068,9 +4068,11 @@ body {
       transform 0.25s ease;
   }
 
+  .app:not(.publicApp) .sidebar.open,
   .app:not(.publicApp) .sidebar.mobileOpen,
   .app:not(.publicApp) .mobileMenuOpen .sidebar {
-    transform: translateX(0);
+    transform: translateX(0) !important;
+    visibility: visible !important;
   }
 
   .app:not(.publicApp) .mobileOverlay {
@@ -4081,6 +4083,22 @@ body {
     width: 100%;
 
     margin-left: 0;
+  }
+
+  .app:not(.publicApp) .mobileClose {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    top: 22px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(71, 84, 103, 0.16);
+    border-radius: 10px;
+    color: #172033;
+    background: rgba(255, 255, 255, 0.82);
+    cursor: pointer;
+    z-index: 5;
   }
 
   .app:not(.publicApp) .topbar {
@@ -10760,5 +10778,273 @@ html body .ghibliBidifiHero .ghibliBidifiHeroCopy > p {
 
   .pageHeader > div:first-child > p {
     width: 94% !important;
+  }
+}
+/* =========================================================
+   FINAL RESPONSIVE COMPATIBILITY PASS
+   Keeps desktop layout intact and improves phones/tablets.
+   ========================================================= */
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+@media (max-width: 760px) {
+  .app:not(.publicApp) {
+    min-width: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden;
+  }
+
+  .app:not(.publicApp) .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: min(86vw, 310px) !important;
+    max-width: 310px !important;
+    margin: 0 !important;
+    transform: translateX(-105%) !important;
+    z-index: 1000 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-shadow: 18px 0 45px rgba(15, 23, 42, 0.18);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app:not(.publicApp) .sidebar.open,
+  .app:not(.publicApp) .sidebar.mobileOpen,
+  .app:not(.publicApp) .mobileMenuOpen .sidebar {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+  }
+
+  .app:not(.publicApp) .mobileOverlay {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 950 !important;
+    display: block !important;
+    background: rgba(15, 23, 42, 0.48) !important;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+
+  .app:not(.publicApp) .mainArea {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .app:not(.publicApp) .topbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 120 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .app:not(.publicApp) .topbarLeft,
+  .app:not(.publicApp) .topbarRight {
+    min-width: 0 !important;
+  }
+
+  .app:not(.publicApp) .topbarLeft {
+    gap: 8px !important;
+  }
+
+  .app:not(.publicApp) .breadcrumb,
+  .app:not(.publicApp) .topbarSearch,
+  .app:not(.publicApp) .topbar .searchBox {
+    max-width: 42vw;
+  }
+
+  .app:not(.publicApp) .content {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 18px 14px 32px !important;
+    overflow-x: hidden !important;
+  }
+
+  .app:not(.publicApp) .pageHeader {
+    width: 100% !important;
+    gap: 14px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .app:not(.publicApp) .pageHeader h1,
+  .app:not(.publicApp) main h1 {
+    font-size: clamp(28px, 8vw, 40px) !important;
+    line-height: 1.08 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .app:not(.publicApp) .pageHeader p {
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+  }
+
+  .app:not(.publicApp) .statsGrid,
+  .app:not(.publicApp) .workflow,
+  .app:not(.publicApp) .dashboardGrid,
+  .app:not(.publicApp) .tenderWorkspace,
+  .app:not(.publicApp) .bidderGrid,
+  .app:not(.publicApp) .reportGrid,
+  .app:not(.publicApp) .verificationStats,
+  .app:not(.publicApp) .reportKpis {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app:not(.publicApp) .card,
+  .app:not(.publicApp) .panel,
+  .app:not(.publicApp) .sectionCard,
+  .app:not(.publicApp) .tableCard,
+  .app:not(.publicApp) .uploadCard {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .app:not(.publicApp) .buttonRow,
+  .app:not(.publicApp) .actions,
+  .app:not(.publicApp) .pageHeader > div:last-child {
+    flex-wrap: wrap !important;
+  }
+
+  .app:not(.publicApp) button {
+    min-height: 42px;
+  }
+
+  .app:not(.publicApp) input,
+  .app:not(.publicApp) select,
+  .app:not(.publicApp) textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .app:not(.publicApp) .requirementsHead,
+  .app:not(.publicApp) .requirementRow {
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+  }
+
+  .app:not(.publicApp) .requirementsHead > :nth-child(n+3),
+  .app:not(.publicApp) .requirementRow > :nth-child(n+3) {
+    display: none !important;
+  }
+
+  .app:not(.publicApp) .evidenceRow {
+    grid-template-columns: 32px minmax(0, 1fr) !important;
+  }
+
+  .app:not(.publicApp) .evidenceDecision {
+    grid-column: 2 !important;
+  }
+
+  .app:not(.publicApp) .verificationHero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app:not(.publicApp) .verificationHero .decisionBlock {
+    border-left: 0 !important;
+    border-right: 0 !important;
+  }
+
+  .app:not(.publicApp) .modal,
+  .app:not(.publicApp) .dialog,
+  .app:not(.publicApp) [role="dialog"] {
+    width: calc(100vw - 28px) !important;
+    max-width: calc(100vw - 28px) !important;
+    max-height: calc(100dvh - 28px) !important;
+    overflow-y: auto !important;
+  }
+
+  .app:not(.publicApp) .mobileMenuButton {
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: grid !important;
+    place-items: center !important;
+    position: relative !important;
+    z-index: 130 !important;
+  }
+
+  .app:not(.publicApp) .mobileClose {
+    display: grid !important;
+    place-items: center !important;
+    position: absolute !important;
+    top: 18px !important;
+    right: 14px !important;
+    width: 40px !important;
+    height: 40px !important;
+    z-index: 1005 !important;
+  }
+
+  /* Home/hero sections */
+  .app:not(.publicApp) .ghibliBidifiHero,
+  .app:not(.publicApp) .hero,
+  .app:not(.publicApp) .heroSection {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .app:not(.publicApp) .ghibliBidifiHeroCopy {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .app:not(.publicApp) .ghibliHeroActions {
+    flex-wrap: wrap !important;
+  }
+}
+
+@media (min-width: 761px) {
+  .app:not(.publicApp) .mobileOverlay {
+    display: none !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .app:not(.publicApp) .content {
+    padding-left: 11px !important;
+    padding-right: 11px !important;
+  }
+
+  .app:not(.publicApp) .topbar {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .app:not(.publicApp) .topbarRight > *:not(.mobileMenuButton) {
+    max-width: 40px;
+  }
+
+  .app:not(.publicApp) .pageHeader h1,
+  .app:not(.publicApp) main h1 {
+    font-size: 29px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app:not(.publicApp) .sidebar {
+    transition: none !important;
   }
 }
