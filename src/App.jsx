@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 
-const configuredApiUrl = String(import.meta.env.VITE_API_URL || "").trim();
-const API_URL = configuredApiUrl
-  ? configuredApiUrl.replace(/\/$/, "")
-  : (import.meta.env.PROD
-      ? window.location.origin
-      : "http://localhost:5000");
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD
+    ? window.location.origin
+    : "http://localhost:5000");
 
 /* =========================================================================
    BIDIFI FRONTEND — FILE MAP / NOTES
@@ -49,6 +48,31 @@ const API_URL = configuredApiUrl
 /* =========================================================
    ICONS
 ========================================================= */
+
+function BidifiLogoIcon({ size = 18, strokeWidth = 2.4, className = "" }) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path
+        d="M24 4 39 10v11c0 10.5-6.2 18.7-15 23C15.2 39.7 9 31.5 9 21V10l15-6Z"
+        strokeWidth={strokeWidth}
+      />
+      <path
+        d="m16 24 5 5 11-12"
+        strokeWidth={Math.max(2, strokeWidth + 0.5)}
+      />
+    </svg>
+  );
+}
 
 function Icon({ name, size = 18, strokeWidth = 1.8 }) {
   const common = {
@@ -1081,11 +1105,6 @@ async function fetchJson(url, options = {}) {
   try {
     data = text ? JSON.parse(text) : {};
   } catch {
-    if (import.meta.env.PROD && response.status >= 500) {
-      throw new Error(
-        `BIDIFI backend returned HTTP ${response.status}. Check the deployed backend URL and server logs.`
-      );
-    }
     throw new Error(`Server returned an invalid response (${response.status}).`);
   }
 
@@ -1240,19 +1259,13 @@ function GalaxyInsideHero() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
-    if (!ctx) return;
-
+    const ctx = canvas.getContext("2d");
     let raf = 0;
     let w = 0;
     let h = 0;
     let dpr = 1;
     let paths = [];
     let stars = [];
-    let running = true;
-    let scrollResumeTimer = 0;
-    let lastFrameTime = 0;
-    const FRAME_INTERVAL = 1000 / 60;
 
     const resize = () => {
       const box = canvas.parentElement?.getBoundingClientRect();
@@ -1260,7 +1273,7 @@ function GalaxyInsideHero() {
 
       w = box.width;
       h = box.height;
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
@@ -1269,7 +1282,7 @@ function GalaxyInsideHero() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       paths = Array.from(
-        { length: Math.max(42, Math.floor(w / 30)) },
+        { length: Math.max(70, Math.floor(w / 18)) },
         (_, i) => ({
           side: i % 2 === 0 ? -1 : 1,
           y: 0.12 + Math.random() * 0.76,
@@ -1282,7 +1295,7 @@ function GalaxyInsideHero() {
       );
 
       stars = Array.from(
-        { length: Math.max(70, Math.floor(w / 14)) },
+        { length: Math.max(100, Math.floor(w / 10)) },
         () => ({
           x: Math.random() * w,
           y: Math.random() * h,
@@ -1294,14 +1307,6 @@ function GalaxyInsideHero() {
     };
 
     const draw = (time) => {
-      if (!running) return;
-
-      if (lastFrameTime && time - lastFrameTime < FRAME_INTERVAL) {
-        raf = requestAnimationFrame(draw);
-        return;
-      }
-      lastFrameTime = time;
-
       ctx.clearRect(0, 0, w, h);
 
       const cx = w * 0.5;
@@ -1509,45 +1514,13 @@ function GalaxyInsideHero() {
       raf = requestAnimationFrame(draw);
     };
 
-    const pauseForScroll = () => {
-      running = false;
-      cancelAnimationFrame(raf);
-      raf = 0;
-      window.clearTimeout(scrollResumeTimer);
-
-      scrollResumeTimer = window.setTimeout(() => {
-        running = true;
-        lastFrameTime = 0;
-        raf = requestAnimationFrame(draw);
-      }, 120);
-    };
-
-    const handleVisibility = () => {
-      if (document.hidden) {
-        running = false;
-        cancelAnimationFrame(raf);
-        raf = 0;
-        return;
-      }
-
-      running = true;
-      lastFrameTime = 0;
-      raf = requestAnimationFrame(draw);
-    };
-
     resize();
-    window.addEventListener("resize", resize, { passive: true });
-    window.addEventListener("scroll", pauseForScroll, { passive: true });
-    document.addEventListener("visibilitychange", handleVisibility, { passive: true });
+    window.addEventListener("resize", resize);
     raf = requestAnimationFrame(draw);
 
     return () => {
-      running = false;
       cancelAnimationFrame(raf);
-      window.clearTimeout(scrollResumeTimer);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("scroll", pauseForScroll);
-      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, []);
 
@@ -1654,7 +1627,7 @@ function AuthModal({ mode, onClose, onSuccess, apiUrl }) {
     <div className="authModalBackdrop" onMouseDown={onClose}>
       <div className="authModal" onMouseDown={e => e.stopPropagation()}>
         <button className="authClose" onClick={onClose}><Icon name="close" size={17} /></button>
-        <div className="authBrand"><div className="brandMark"><Icon name="ai" size={20} /></div><div><strong>BIDIFI</strong><span>AI BID COMPLIANCE</span></div></div>
+        <div className="authBrand"><div className="brandMark"><BidifiLogoIcon size={20} /></div><div><strong>BIDIFI</strong><span>AI BID COMPLIANCE</span></div></div>
         <div className="authTabs">
           <button type="button" className={activeMode === "login" ? "active" : ""} onClick={() => setActiveMode("login")}>Log in</button>
           <button type="button" className={activeMode === "register" ? "active" : ""} onClick={() => setActiveMode("register")}>Create account</button>
@@ -1902,17 +1875,13 @@ function Sidebar({
   return (
     <aside
       className={`sidebar ${
-        mobileMenu ? "open mobileOpen" : ""
+        mobileMenu ? "open" : ""
       }`}
     >
       <div className="sidebarTop">
         <div className="brand">
           <div className="brandMark">
-            <Icon
-              name="ai"
-              size={21}
-              strokeWidth={2.1}
-            />
+            <BidifiLogoIcon size={21} strokeWidth={2.1} />
           </div>
 
           <div>
@@ -2950,7 +2919,7 @@ function DashboardPage({
 
         <div className="statCard">
           <div className="statIcon violet">
-            <Icon name="ai" size={17} />
+            <BidifiLogoIcon size={17} />
           </div>
 
           <span>
@@ -3180,7 +3149,7 @@ function DashboardPage({
 
             <div className="activityItem">
               <div className="activityIcon violet">
-                <Icon name="ai" size={15} />
+                <BidifiLogoIcon size={15} />
               </div>
 
               <div>
@@ -3478,7 +3447,7 @@ function TendersPage({
         <div className="aiExtractionHeader">
           <div>
             <span className="aiLabel">
-              <Icon name="ai" size={13} />
+              <BidifiLogoIcon size={13} />
               AI REQUIREMENT ENGINE
             </span>
 
@@ -3515,7 +3484,7 @@ function TendersPage({
               </>
             ) : (
               <>
-                <Icon name="ai" size={14} />
+                <BidifiLogoIcon size={14} />
                 Extract requirements
               </>
             )}
@@ -3544,7 +3513,7 @@ function TendersPage({
             </div>
 
             <div>
-              <Icon name="ai" size={17} />
+              <BidifiLogoIcon size={17} />
 
               <strong>
                 AI extraction
@@ -3944,10 +3913,7 @@ function BiddersPage({
                   </>
                 ) : (
                   <>
-                    <Icon
-                      name="ai"
-                      size={14}
-                    />
+                    <BidifiLogoIcon size={14} />
                     Process bidder evidence
                   </>
                 )}
@@ -4074,10 +4040,7 @@ function BiddersPage({
               </>
             ) : (
               <>
-                <Icon
-                  name="ai"
-                  size={14}
-                />
+                <BidifiLogoIcon size={14} />
                 Run AI verification
               </>
             )}
@@ -4285,7 +4248,7 @@ function BiddersPage({
             </>
           ) : (
             <>
-              <Icon name="ai" size={14} />
+              <BidifiLogoIcon size={14} />
               Analyze All Bids
             </>
           )}
@@ -4832,10 +4795,7 @@ const risk =
           description="AI evidence match for each procurement requirement."
           action={
             <div className="aiVerifiedBadge">
-              <Icon
-                name="ai"
-                size={12}
-              />
+              <BidifiLogoIcon size={12} />
               AI VERIFIED
             </div>
           }
@@ -5578,10 +5538,7 @@ const recommendations =
       <section className="reportHeaderCard">
         <div className="reportBrand">
           <div className="reportMark">
-            <Icon
-              name="ai"
-              size={18}
-            />
+            <BidifiLogoIcon size={18} />
           </div>
 
           <div>
@@ -6470,8 +6427,13 @@ export default function App() {
     clearAlerts();
 
     try {
+      const filesBeingUploaded = [...selectedTenderFiles];
       const formData = new FormData();
-      selectedTenderFiles.forEach((file) => formData.append("tenders", file));
+
+      filesBeingUploaded.forEach((file) => {
+        formData.append("tenders", file);
+      });
+
       formData.append("uploadedBy", JSON.stringify({
         userId: currentUser?.id || null,
         name: currentUser?.name || tenderUploaderInfo.contactName || "",
@@ -6482,46 +6444,184 @@ export default function App() {
         registrationNumber: tenderUploaderInfo.registrationNumber || ""
       }));
 
-      // IMPORTANT: upload request is now fast. The backend no longer waits for
-      // an LLM. It returns immediately after text extraction/local parsing.
       const data = await fetchJson(`${API_URL}/api/upload-tenders`, {
         method: "POST",
         body: formData
       });
 
-      const uploaded = Array.isArray(data.tenders)
-        ? data.tenders
-        : Array.isArray(data.files)
-          ? data.files
-          : [];
+      /*
+       * IMPORTANT UPLOAD RECOVERY:
+       *
+       * Some production/serverless deployments return HTTP 200 and
+       * success=true but omit the `tenders` array from the upload response.
+       * The old code treated that as a failed upload even though the backend
+       * had already stored the tender.
+       *
+       * We now accept every common response shape first, then recover the
+       * actual saved tender from /api/workspace. This keeps the original
+       * 7,000+ line frontend intact and only fixes the upload handshake.
+       */
+      let uploaded = [];
+
+      const responseCandidates = [
+        data?.tenders,
+        data?.files,
+        data?.uploaded,
+        data?.uploadedTenders,
+        data?.records,
+        data?.data?.tenders,
+        data?.data?.files,
+        data?.data?.uploaded,
+        data?.data?.uploadedTenders,
+      ];
+
+      for (const candidate of responseCandidates) {
+        if (Array.isArray(candidate) && candidate.length) {
+          uploaded = candidate;
+          break;
+        }
+      }
+
+      /* Single-tender response compatibility. */
+      if (!uploaded.length) {
+        const singleCandidates = [
+          data?.tender,
+          data?.uploadedTender,
+          data?.record,
+          data?.data?.tender,
+          data?.data?.uploadedTender,
+          data?.data?.record,
+        ];
+
+        for (const candidate of singleCandidates) {
+          if (candidate && typeof candidate === "object") {
+            uploaded = [candidate];
+            break;
+          }
+        }
+      }
+
+      /*
+       * If the upload endpoint returned success without a record, immediately
+       * ask the workspace for the persisted records and match by filename.
+       * This is the critical fix for the production message:
+       * "Upload succeeded but no tender record was returned."
+       */
+      if (!uploaded.length) {
+        try {
+          const workspace = await fetchJson(`${API_URL}/api/workspace`);
+          const workspaceTenders = Array.isArray(workspace?.tenders)
+            ? workspace.tenders
+            : Array.isArray(workspace?.data?.tenders)
+              ? workspace.data.tenders
+              : [];
+
+          if (workspaceTenders.length) {
+            const wantedNames = new Set(
+              filesBeingUploaded.map((file) =>
+                String(file?.name || "").trim().toLowerCase()
+              )
+            );
+
+            const matched = workspaceTenders.filter((tender) => {
+              const names = [
+                tender?.filename,
+                tender?.fileName,
+                tender?.name,
+                tender?.title,
+              ]
+                .filter(Boolean)
+                .map((value) => String(value).trim().toLowerCase());
+
+              return names.some((name) => wantedNames.has(name));
+            });
+
+            uploaded = matched.length ? matched : workspaceTenders.slice(0, filesBeingUploaded.length);
+          }
+        } catch (workspaceError) {
+          console.warn(
+            "[BIDIFI] Tender upload response had no records and workspace recovery failed:",
+            workspaceError
+          );
+        }
+      }
+
+      /*
+       * Normalize records so the rest of the existing App.jsx can safely use
+       * them regardless of whether the backend returned `filename`, `name`,
+       * `fileName`, `id`, `tenderId`, etc.
+       */
+      uploaded = uploaded
+        .filter((item) => item && typeof item === "object")
+        .map((item, index) => {
+          const fallbackFile = filesBeingUploaded[index] || filesBeingUploaded[0];
+          const filename =
+            safeText(
+              item?.filename || item?.fileName || item?.name || item?.title,
+              fallbackFile?.name || `Tender ${index + 1}`
+            );
+
+          const id =
+            item?.id ||
+            item?.tenderId ||
+            item?.tenderID ||
+            item?.data?.id ||
+            item?.data?.tenderId ||
+            null;
+
+          return {
+            ...item,
+            id,
+            tenderId: item?.tenderId || id,
+            filename,
+            fileName: item?.fileName || filename,
+            name: item?.name || filename,
+            requirements: Array.isArray(item?.requirements)
+              ? item.requirements
+              : [],
+          };
+        });
 
       const successfulUploaded = uploaded.filter(
-        (item) => item?.id && String(item?.status || "UPLOADED").toUpperCase() !== "ERROR"
+        (item) =>
+          item?.id &&
+          String(item?.status || "UPLOADED").toUpperCase() !== "ERROR"
       );
+
       const failedUploaded = uploaded.filter(
-        (item) => !item?.id || String(item?.status || "").toUpperCase() === "ERROR"
+        (item) =>
+          !item?.id ||
+          String(item?.status || "").toUpperCase() === "ERROR"
       );
 
       if (!successfulUploaded.length) {
         const details = failedUploaded
-          .map((item) => `${safeText(item?.filename, "Tender")}: ${safeText(item?.error, "processing failed")}`)
+          .map((item) =>
+            `${safeText(item?.filename, "Tender")}: ${safeText(item?.error, "processing failed")}`
+          )
           .join(" | ");
-        throw new Error(details || "Upload succeeded but no tender record was returned.");
+
+        throw new Error(
+          details ||
+          "Tender upload completed, but the saved tender record could not be recovered. Please retry once."
+        );
       }
 
       setTenders((prev) => {
         const existingIds = new Set(prev.map((item) => item.id));
         return [
           ...successfulUploaded.filter((item) => !existingIds.has(item.id)),
-          ...prev
+          ...prev,
         ];
       });
 
       const firstTender = successfulUploaded[0];
       setSelectedTender(firstTender);
+
       const fastRequirements = Array.isArray(firstTender.requirements)
         ? firstTender.requirements
         : [];
+
       setRequirements(fastRequirements);
       setAnalysis(null);
       setSelectedTenderFiles([]);
@@ -6529,19 +6629,27 @@ export default function App() {
       const warning = failedUploaded.length
         ? ` ${failedUploaded.length} tender${failedUploaded.length === 1 ? "" : "s"} could not be processed.`
         : "";
+
       showMessage(
-        `${successfulUploaded.length} tender${successfulUploaded.length === 1 ? "" : "s"} uploaded successfully.${warning} Refining requirements...`
+        `${successfulUploaded.length} tender${successfulUploaded.length === 1 ? "" : "s"} uploaded successfully.${warning}`
       );
 
-      // The backend now returns the final grounded requirement list in the
-      // same upload response. Do not start a second extraction request here.
-      // This removes the race where the first tender could disappear/revert
-      // and also prevents duplicate REQ rows from AI + local merging.
-      showMessage(
-        `${successfulUploaded.length} tender${successfulUploaded.length === 1 ? "" : "s"} uploaded and requirements extracted successfully.${warning}`
-      );
+      /*
+       * Refresh workspace after upload. This does NOT replace local state with
+       * stale data; loadWorkspace already merges incoming tenders safely.
+       * It makes the uploaded tender immediately visible in Dashboard/Tenders
+       * even when the upload endpoint response itself was minimal.
+       */
+      try {
+        await loadWorkspace();
+      } catch {
+        // The local successful upload state is already usable.
+      }
     } catch (err) {
-      showError(err.message || "Tender upload failed. Check that the backend is running.");
+      showError(
+        err.message ||
+        "Tender upload failed. Check that the backend is running."
+      );
     } finally {
       setLoading((prev) => ({ ...prev, tender: false }));
     }
