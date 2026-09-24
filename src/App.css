@@ -11048,3 +11048,1018 @@ textarea {
     transition: none !important;
   }
 }
+/* =========================================
+   BIDIFI AGENT WAVE - TEXT SIZE OVERRIDE
+   ========================================= */
+
+/* TENDER / EVIDENCE / REPORT */
+.bidifiAgentWaveLabel b {
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+}
+
+/* requirements / verification / compliance result */
+.bidifiAgentWaveLabel span {
+  font-size: 10px !important;
+  line-height: 1.3 !important;
+  font-weight: 650 !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* BIDIFI */
+.bidifiAgentWaveCoreText {
+  font-size: 19px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* AI */
+.bidifiAgentWaveCore span {
+  font-size: 9px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.22em !important;
+}
+
+
+/* ---------- TABLET ---------- */
+@media (max-width: 900px) {
+  .bidifiAgentWaveLabel b {
+    font-size: 12px !important;
+  }
+
+  .bidifiAgentWaveLabel span {
+    font-size: 9px !important;
+  }
+
+  .bidifiAgentWaveCoreText {
+    font-size: 18px !important;
+  }
+
+  .bidifiAgentWaveCore span {
+    font-size: 8px !important;
+  }
+}
+
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 560px) {
+  .bidifiAgentWaveLabel {
+    min-width: 100px !important;
+    padding: 8px 10px !important;
+  }
+
+  .bidifiAgentWaveLabel b {
+    font-size: 10px !important;
+  }
+
+  .bidifiAgentWaveLabel span {
+    font-size: 8px !important;
+  }
+
+  .bidifiAgentWaveCoreText {
+    font-size: 16px !important;
+  }
+
+  .bidifiAgentWaveCore span {
+    font-size: 7px !important;
+  }
+}
+/* =========================================
+   BIDIFI AGENT WAVE - CENTER TEXT VISIBILITY
+   ========================================= */
+
+.bidifiAgentWaveCoreText {
+  color: #ffffff !important;
+  font-size: 19px !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.08em !important;
+  line-height: 1 !important;
+
+  /* Bright cyan/blue glow so it stays visible over the wave */
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 1),
+    0 0 10px rgba(56, 189, 248, 1),
+    0 0 20px rgba(59, 130, 246, 0.95),
+    0 0 34px rgba(99, 102, 241, 0.8) !important;
+}
+
+/* AI text below BIDIFI */
+.bidifiAgentWaveCore span {
+  color: #67e8f9 !important;
+  font-size: 9px !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.24em !important;
+  line-height: 1 !important;
+
+  text-shadow:
+    0 0 5px rgba(103, 232, 249, 1),
+    0 0 12px rgba(34, 211, 238, 0.95),
+    0 0 22px rgba(59, 130, 246, 0.8) !important;
+}
+
+
+/* Make the center itself slightly brighter */
+.bidifiAgentWaveCore {
+  color: #ffffff !important;
+  background:
+    radial-gradient(
+      circle,
+      rgba(56, 189, 248, 0.22) 0%,
+      rgba(37, 99, 235, 0.10) 42%,
+      transparent 72%
+    ) !important;
+}
+
+
+/* Mobile */
+@media (max-width: 560px) {
+  .bidifiAgentWaveCoreText {
+    font-size: 16px !important;
+  }
+
+  .bidifiAgentWaveCore span {
+    font-size: 8px !important;
+  }
+}
+
+/* =========================================================
+   BIDIFI — RADIAL GLOW BUTTON ANIMATION
+   Applied globally to buttons without requiring JSX changes.
+   ========================================================= */
+
+@property --bidifi-rg-pos-x {
+  syntax: '<percentage>';
+  initial-value: 40%;
+  inherits: false;
+}
+
+@property --bidifi-rg-pos-y {
+  syntax: '<percentage>';
+  initial-value: 140%;
+  inherits: false;
+}
+
+@property --bidifi-rg-spread-x {
+  syntax: '<percentage>';
+  initial-value: 130%;
+  inherits: false;
+}
+
+@property --bidifi-rg-spread-y {
+  syntax: '<percentage>';
+  initial-value: 170%;
+  inherits: false;
+}
+
+@property --bidifi-rg-color-1 {
+  syntax: '<color>';
+  initial-value: rgba(0, 0, 32, 0.18);
+  inherits: false;
+}
+
+@property --bidifi-rg-color-2 {
+  syntax: '<color>';
+  initial-value: rgba(241, 255, 165, 0.12);
+  inherits: false;
+}
+
+@property --bidifi-rg-color-3 {
+  syntax: '<color>';
+  initial-value: rgba(70, 147, 150, 0.14);
+  inherits: false;
+}
+
+/* Every button gets the radial-glow animation */
+.app button,
+.publicApp button,
+button {
+  --bidifi-rg-pos-x: 40%;
+  --bidifi-rg-pos-y: 140%;
+  --bidifi-rg-spread-x: 130%;
+  --bidifi-rg-spread-y: 170%;
+  --bidifi-rg-color-1: rgba(0, 0, 32, 0.18);
+  --bidifi-rg-color-2: rgba(241, 255, 165, 0.12);
+  --bidifi-rg-color-3: rgba(70, 147, 150, 0.14);
+
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    --bidifi-rg-pos-x 0.75s ease,
+    --bidifi-rg-pos-y 0.75s ease,
+    --bidifi-rg-spread-x 0.75s ease,
+    --bidifi-rg-spread-y 0.75s ease,
+    --bidifi-rg-color-1 0.75s ease,
+    --bidifi-rg-color-2 0.75s ease,
+    --bidifi-rg-color-3 0.75s ease,
+    transform 0.22s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+}
+
+/* Glow layer */
+.app button::after,
+.publicApp button::after,
+button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+
+  background:
+    radial-gradient(
+      var(--bidifi-rg-spread-x) var(--bidifi-rg-spread-y)
+      at var(--bidifi-rg-pos-x) var(--bidifi-rg-pos-y),
+      var(--bidifi-rg-color-1) 0%,
+      var(--bidifi-rg-color-2) 45%,
+      var(--bidifi-rg-color-3) 72%,
+      transparent 100%
+    );
+
+  opacity: 0.8;
+  mix-blend-mode: screen;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+/* Hover state copied from the supplied RadialGlowButton concept */
+.app button:hover,
+.publicApp button:hover,
+button:hover {
+  --bidifi-rg-pos-x: 0%;
+  --bidifi-rg-pos-y: 120%;
+  --bidifi-rg-spread-x: 110%;
+  --bidifi-rg-spread-y: 110%;
+  --bidifi-rg-color-1: rgba(0, 0, 32, 0.10);
+  --bidifi-rg-color-2: rgba(241, 255, 165, 0.34);
+  --bidifi-rg-color-3: rgba(70, 147, 150, 0.28);
+
+  filter: brightness(1.035);
+}
+
+.app button:hover::after,
+.publicApp button:hover::after,
+button:hover::after {
+  opacity: 1;
+  animation: bidifi-rg-pulse 1.8s ease-in-out infinite alternate;
+}
+
+/* Stronger version for the main CTA buttons */
+.app:not(.publicApp) .primaryButton::after,
+.app:not(.publicApp) .heroButton::after,
+.app:not(.publicApp) .aiButton::after {
+  background:
+    radial-gradient(
+      125% 150% at var(--bidifi-rg-pos-x) var(--bidifi-rg-pos-y),
+      rgba(0, 0, 32, 0.20) 0%,
+      rgba(241, 255, 165, 0.30) 38%,
+      rgba(70, 147, 150, 0.24) 62%,
+      rgba(31, 63, 109, 0.10) 82%,
+      transparent 100%
+    );
+}
+
+/* Secondary buttons keep their original appearance while receiving glow */
+.app:not(.publicApp) .secondaryButton::after,
+.app:not(.publicApp) .textButton::after,
+.app:not(.publicApp) .iconButton::after {
+  opacity: 0.45;
+  mix-blend-mode: multiply;
+}
+
+@keyframes bidifi-rg-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scale(1.045);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.015);
+    opacity: 0.82;
+  }
+}
+
+/* Do not disturb button text/icons */
+.app button > *,
+.publicApp button > *,
+button > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Touch devices: keep the effect but avoid sticky hover behavior */
+@media (hover: none) {
+  .app button:hover,
+  .publicApp button:hover,
+  button:hover {
+    filter: none;
+  }
+
+  .app button:hover::after,
+  .publicApp button:hover::after,
+  button:hover::after {
+    animation: none;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .app button,
+  .publicApp button,
+  button,
+  .app button::after,
+  .publicApp button::after,
+  button::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+/* =========================================================
+   TENDER UPLOAD — AI REQUIREMENT ENGINE CENTER ALIGN
+   Paste this at the VERY END of App.css
+   ========================================================= */
+
+.aiExtractionPanel .aiExtractionHeader {
+  position: relative !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 150px !important;
+}
+
+/* Main text wrapper */
+.aiExtractionPanel .aiExtractionHeader > div:first-child {
+  width: 100% !important;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* AI REQUIREMENT ENGINE */
+.aiExtractionPanel .aiExtractionHeader .aiLabel {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  margin: 0 auto 10px !important;
+  text-align: center !important;
+}
+
+/* Tender filename / selected tender name */
+.aiExtractionPanel .aiExtractionHeader h2 {
+  width: 100% !important;
+  margin: 0 auto 10px !important;
+  text-align: center !important;
+  font-size: clamp(20px, 2.4vw, 30px) !important;
+  line-height: 1.2 !important;
+  font-weight: 800 !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Description */
+.aiExtractionPanel .aiExtractionHeader p {
+  width: 100% !important;
+  max-width: 720px !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+  line-height: 1.65 !important;
+}
+
+/* Extract requirements button — keep it on the right,
+   without disturbing the centered text */
+.aiExtractionPanel .aiExtractionHeader > .aiButton {
+  position: absolute !important;
+  right: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  flex-shrink: 0 !important;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .aiExtractionPanel .aiExtractionHeader {
+    min-height: auto !important;
+    padding-bottom: 62px !important;
+  }
+
+  .aiExtractionPanel .aiExtractionHeader > .aiButton {
+    top: auto !important;
+    bottom: 0 !important;
+    right: 50% !important;
+    transform: translateX(50%) !important;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .aiExtractionPanel .aiExtractionHeader {
+    padding-bottom: 58px !important;
+  }
+
+  .aiExtractionPanel .aiExtractionHeader > div:first-child {
+    max-width: 100% !important;
+  }
+
+  .aiExtractionPanel .aiExtractionHeader .aiLabel {
+    font-size: 9px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .aiExtractionPanel .aiExtractionHeader h2 {
+    font-size: 19px !important;
+    line-height: 1.25 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .aiExtractionPanel .aiExtractionHeader p {
+    font-size: 11px !important;
+    line-height: 1.55 !important;
+    max-width: 95% !important;
+  }
+
+  .aiExtractionPanel .aiExtractionHeader > .aiButton {
+    width: auto !important;
+    max-width: 100% !important;
+    white-space: nowrap !important;
+  }
+}
+/* =========================================================
+   EXTRACT REQUIREMENTS BUTTON
+   MOVE SLIGHTLY LEFT — NO SIZE / SECTION CHANGE
+   ========================================================= */
+
+.aiExtractionHeader {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.aiExtractionHeader > .aiButton {
+  margin-right: 18px !important;
+  flex-shrink: 0 !important;
+}
+/* =========================================================
+   BATCH BID ANALYSIS — CENTER + SLIGHTLY LARGER TEXT
+   ========================================================= */
+
+.panel > .panelHeader:has(h3) {
+  /* keep existing panel layout unchanged */
+}
+
+.panel > .panelHeader h3 {
+  font-size: 18px !important;
+}
+
+.panel > .panelHeader p {
+  font-size: 14px !important;
+}
+
+/* Center only the Batch Bid Analysis header */
+.panel:has(.panelHeader h3) .panelHeader {
+  text-align: center;
+}
+
+.panel:has(.panelHeader h3) .panelHeader > div:first-child {
+  flex: 1;
+}
+/* =========================================================
+   BIDDER WORKSPACE - BIDIFI SHIELD ONLY
+   ========================================================= */
+
+/* Shield SVG/path ko white */
+[class*="bidder"] svg path,
+[class*="Bidder"] svg path {
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Shield agar logo ke andar polygon/shape hai */
+[class*="bidder"] svg polygon,
+[class*="Bidder"] svg polygon,
+[class*="bidder"] svg rect,
+[class*="Bidder"] svg rect {
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Logo ka background/change na ho */
+[class*="bidder"] svg {
+  background: transparent !important;
+}
+/* =========================================================
+   BIDIFI NON-HOME TEXT CONTRAST
+   Same readable text language as BID READINESS
+   HOME PAGE IS NOT AFFECTED
+   ========================================================= */
+
+.blueWorkspacePage,
+.blueWorkspaceContent {
+  color: #e2e8f0 !important;
+}
+
+/* ---------- MAIN TEXT ---------- */
+
+.blueWorkspacePage h1,
+.blueWorkspacePage h2,
+.blueWorkspacePage h3,
+.blueWorkspacePage h4,
+.blueWorkspacePage h5,
+.blueWorkspacePage h6,
+.blueWorkspaceContent h1,
+.blueWorkspaceContent h2,
+.blueWorkspaceContent h3,
+.blueWorkspaceContent h4,
+.blueWorkspaceContent h5,
+.blueWorkspaceContent h6 {
+  color: #f8fafc !important;
+}
+
+/* ---------- NORMAL TEXT ---------- */
+
+.blueWorkspacePage p,
+.blueWorkspacePage span,
+.blueWorkspacePage div,
+.blueWorkspacePage li,
+.blueWorkspacePage td,
+.blueWorkspacePage th,
+.blueWorkspacePage label,
+.blueWorkspacePage small,
+.blueWorkspacePage strong,
+.blueWorkspacePage b,
+.blueWorkspaceContent p,
+.blueWorkspaceContent span,
+.blueWorkspaceContent li,
+.blueWorkspaceContent td,
+.blueWorkspaceContent th,
+.blueWorkspaceContent label,
+.blueWorkspaceContent small,
+.blueWorkspaceContent strong,
+.blueWorkspaceContent b {
+  color: #e2e8f0 !important;
+}
+
+/* ---------- HEADERS / TITLES ---------- */
+
+.blueWorkspacePage .pageHeader h1,
+.blueWorkspacePage .panelHeader h3,
+.blueWorkspacePage .panel h2,
+.blueWorkspacePage .panel h3,
+.blueWorkspacePage .sectionTitle,
+.blueWorkspacePage .title,
+.blueWorkspacePage .heading,
+.blueWorkspacePage .cardTitle,
+.blueWorkspacePage .statValue,
+.blueWorkspacePage .value,
+.blueWorkspacePage .number {
+  color: #f8fafc !important;
+}
+
+/* ---------- SECONDARY / DESCRIPTION TEXT ---------- */
+
+.blueWorkspacePage .pageHeader p,
+.blueWorkspacePage .pageEyebrow,
+.blueWorkspacePage .subtitle,
+.blueWorkspacePage .description,
+.blueWorkspacePage .helperText,
+.blueWorkspacePage .muted,
+.blueWorkspacePage .hint,
+.blueWorkspacePage .caption,
+.blueWorkspacePage .panelHeader p,
+.blueWorkspacePage .panel small,
+.blueWorkspacePage .statCard small {
+  color: #94a3b8 !important;
+}
+
+/* ---------- BLUE ACCENT TEXT ---------- */
+
+.blueWorkspacePage a,
+.blueWorkspacePage .link,
+.blueWorkspacePage .accent,
+.blueWorkspacePage .aiLabel,
+.blueWorkspacePage .sectionEyebrow,
+.blueWorkspacePage .eyebrow {
+  color: #60a5fa !important;
+}
+
+/* ---------- INPUT / FORM TEXT ---------- */
+
+.blueWorkspacePage input,
+.blueWorkspacePage textarea,
+.blueWorkspacePage select,
+.blueWorkspacePage [role="textbox"] {
+  color: #f1f5f9 !important;
+  background: #0b182d !important;
+  border-color: rgba(147,197,253,.28) !important;
+}
+
+.blueWorkspacePage input::placeholder,
+.blueWorkspacePage textarea::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+/* ---------- TABLE TEXT ---------- */
+
+.blueWorkspacePage table,
+.blueWorkspacePage table td,
+.blueWorkspacePage table th {
+  color: #e2e8f0 !important;
+}
+
+.blueWorkspacePage table th {
+  color: #f8fafc !important;
+  background: #142947 !important;
+}
+
+.blueWorkspacePage table td {
+  color: #dbeafe !important;
+  background: #0e1d35 !important;
+}
+
+/* ---------- CARDS / PANELS ---------- */
+
+.blueWorkspacePage .panel,
+.blueWorkspacePage .card,
+.blueWorkspacePage .section,
+.blueWorkspacePage .statCard,
+.blueWorkspacePage .emptyState,
+.blueWorkspacePage .emptyVerification,
+.blueWorkspacePage .verificationHero,
+.blueWorkspacePage .verificationStat {
+  color: #e2e8f0 !important;
+}
+
+/* ---------- LABELS ---------- */
+
+.blueWorkspacePage label,
+.blueWorkspacePage .label,
+.blueWorkspacePage .fieldLabel,
+.blueWorkspacePage .formLabel {
+  color: #cbd5e1 !important;
+}
+
+/* ---------- NUMBERS / KPI ---------- */
+
+.blueWorkspacePage .statValue,
+.blueWorkspacePage .statNumber,
+.blueWorkspacePage .kpiValue,
+.blueWorkspacePage .score,
+.blueWorkspacePage .percentage,
+.blueWorkspacePage .count {
+  color: #f8fafc !important;
+}
+
+/* ---------- BUTTON TEXT ---------- */
+
+.blueWorkspacePage button {
+  color: #f8fafc !important;
+}
+
+.blueWorkspacePage button svg {
+  color: #dbeafe !important;
+}
+
+/* ---------- SECONDARY BUTTON ---------- */
+
+.blueWorkspacePage .secondaryButton {
+  color: #dbeafe !important;
+  background: rgba(30,58,95,.55) !important;
+  border-color: rgba(147,197,253,.22) !important;
+}
+
+/* ---------- UPLOAD / DROP AREA ---------- */
+
+.blueWorkspacePage .dropzone,
+.blueWorkspacePage .tenderDropzone,
+.blueWorkspacePage .uploadZone,
+.blueWorkspacePage [class*="dropZone"],
+.blueWorkspacePage [class*="uploadZone"] {
+  color: #e2e8f0 !important;
+}
+
+.blueWorkspacePage .dropzone *,
+.blueWorkspacePage .tenderDropzone *,
+.blueWorkspacePage .uploadZone * {
+  color: #e2e8f0 !important;
+}
+
+/* Upload heading */
+.blueWorkspacePage .dropzone h3,
+.blueWorkspacePage .tenderDropzone h3,
+.blueWorkspacePage .uploadZone h3 {
+  color: #f8fafc !important;
+}
+
+/* Upload helper text */
+.blueWorkspacePage .dropzone p,
+.blueWorkspacePage .tenderDropzone p,
+.blueWorkspacePage .uploadZone p {
+  color: #94a3b8 !important;
+}
+
+/* ---------- ICONS ---------- */
+
+.blueWorkspacePage svg {
+  color: #dbeafe !important;
+}
+
+.blueWorkspacePage .icon,
+.blueWorkspacePage [class*="Icon"],
+.blueWorkspacePage [class*="icon"] {
+  color: #dbeafe !important;
+}
+
+/* Accent icons */
+.blueWorkspacePage .aiLabel svg,
+.blueWorkspacePage .accent svg {
+  color: #60a5fa !important;
+}
+
+/* ---------- STATUS / BADGES ---------- */
+
+.blueWorkspacePage .badge,
+.blueWorkspacePage .statusBadge,
+.blueWorkspacePage .status,
+.blueWorkspacePage .chip {
+  color: #e2e8f0 !important;
+}
+
+/* ---------- FILE ROWS ---------- */
+
+.blueWorkspacePage .fileRow,
+.blueWorkspacePage .fileRow * {
+  color: #dbeafe !important;
+}
+
+.blueWorkspacePage .fileRow strong,
+.blueWorkspacePage .fileRow b {
+  color: #f8fafc !important;
+}
+
+/* ---------- TENDER / BIDDER LIST ---------- */
+
+.blueWorkspacePage .tenderListItem,
+.blueWorkspacePage .tenderListItem *,
+.blueWorkspacePage .bidderItem,
+.blueWorkspacePage .bidderItem * {
+  color: #e2e8f0 !important;
+}
+
+.blueWorkspacePage .tenderListItem strong,
+.blueWorkspacePage .bidderItem strong {
+  color: #f8fafc !important;
+}
+
+/* ---------- VERIFICATION CONTENT ---------- */
+
+.blueWorkspacePage .verificationHero *,
+.blueWorkspacePage .verificationStat *,
+.blueWorkspacePage .verificationChecklist * {
+  color: #e2e8f0 !important;
+}
+
+.blueWorkspacePage .verificationHero h2,
+.blueWorkspacePage .verificationStat strong {
+  color: #f8fafc !important;
+}
+
+/* ---------- EMPTY STATES ---------- */
+
+.blueWorkspacePage .emptyState *,
+.blueWorkspacePage .emptyVerification * {
+  color: #e2e8f0 !important;
+}
+
+.blueWorkspacePage .emptyState h3,
+.blueWorkspacePage .emptyVerification h2 {
+  color: #f8fafc !important;
+}
+
+.blueWorkspacePage .emptyState p,
+.blueWorkspacePage .emptyVerification p {
+  color: #94a3b8 !important;
+}
+
+/* ---------- CHECKBOX / RADIO / SVG VISIBILITY ---------- */
+
+.blueWorkspacePage input[type="checkbox"],
+.blueWorkspacePage input[type="radio"] {
+  accent-color: #60a5fa;
+}
+
+/* ---------- DISABLED TEXT ---------- */
+
+.blueWorkspacePage [disabled] {
+  color: #7185a5 !important;
+}
+
+/* ---------- DO NOT AFFECT HOME ---------- */
+
+.homeContent {
+  color: inherit;
+}
+
+.homeContent *,
+.homeContent *::before,
+.homeContent *::after 
+  /* Home keeps its original styling */
+
+/* =========================================================
+   BIDIFI TASKBAR - REMOVE GREY / LIGHT BACKGROUND
+   ========================================================= */
+
+aside.sidebar,
+.sidebar {
+  background: #071a30 !important;
+  background-image: none !important;
+  background-color: #071a30 !important;
+  opacity: 1 !important;
+}
+
+/* Remove any grey/light overlay */
+aside.sidebar::before,
+aside.sidebar::after,
+.sidebar::before,
+.sidebar::after {
+  background: transparent !important;
+  background-image: none !important;
+  opacity: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Sidebar inner wrappers */
+aside.sidebar > *,
+.sidebar > *,
+.sidebar .sidebarInner,
+.sidebar .sidebarContent,
+.sidebar .sidebarNav,
+.sidebar nav {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Navigation buttons */
+aside.sidebar nav button,
+.sidebar nav button,
+.sidebar .navItem,
+.sidebar .sidebarItem {
+  background: #102b49 !important;
+  background-image: none !important;
+  color: #8fb6dc !important;
+  border-color: #21476d !important;
+  box-shadow: none !important;
+}
+
+/* Hover */
+aside.sidebar nav button:hover,
+.sidebar nav button:hover,
+.sidebar .navItem:hover,
+.sidebar .sidebarItem:hover {
+  background: #173b60 !important;
+  background-image: none !important;
+  color: #b9d7f2 !important;
+}
+
+/* Active item */
+aside.sidebar nav button.active,
+.sidebar nav button.active,
+.sidebar .navItem.active,
+.sidebar .sidebarItem.active,
+.sidebar nav button[aria-current="page"] {
+  background: #1b4b78 !important;
+  background-image: none !important;
+  color: #d5e9fa !important;
+  border-color: #3b91e8 !important;
+}
+
+/* Icons */
+aside.sidebar svg,
+.sidebar svg {
+  color: #79aee0 !important;
+  stroke: #79aee0 !important;
+}
+
+/* Workspace heading */
+aside.sidebar .workspace,
+aside.sidebar .sectionLabel,
+.sidebar .workspace,
+.sidebar .sectionLabel {
+  color: #6f9bc5 !important;
+}
+
+/* System status card */
+aside.sidebar .systemStatus,
+.sidebar .systemStatus {
+  background: #0b2947 !important;
+  background-image: none !important;
+  border-color: #214d75 !important;
+}
+
+/* Settings */
+aside.sidebar .settings,
+.sidebar .settings {
+  background: #102b49 !important;
+  background-image: none !important;
+  color: #8fb6dc !important;
+}
+
+/* User/profile card */
+aside.sidebar .profile,
+aside.sidebar .userCard,
+.sidebar .profile,
+.sidebar .userCard {
+  background: #0b2947 !important;
+  background-image: none !important;
+  color: #9fc2df !important;
+}
+/* Sidebar profile - Krishna same colour as Administrator */
+aside.sidebar .profile strong,
+aside.sidebar .userCard strong,
+.sidebar .profile strong,
+.sidebar .userCard strong {
+  color: #9fc2df !important;
+  -webkit-text-fill-color: #9fc2df !important;
+}
+/* =========================================================
+   HOME - REMOVE WHITE RECENT TENDER + AI ACTIVITY CARDS
+   ========================================================= */
+
+/* Recent tender cards */
+.dashboardHomePage .recentTender,
+.dashboardHomePage .recentTender:hover,
+.dashboardHomePage .recentTender:focus,
+.dashboardHomePage .recentTender:active {
+  background: linear-gradient(145deg, #122844, #0d1e35) !important;
+  background-color: #122844 !important;
+  border-color: rgba(96,165,250,.18) !important;
+  box-shadow: none !important;
+}
+
+/* Prevent selected tender from becoming white */
+.dashboardHomePage .recentTender.selected,
+.dashboardHomePage .recentTender.selected:hover {
+  background: linear-gradient(145deg, #17385c, #102945) !important;
+  background-color: #17385c !important;
+}
+
+/* AI Activity cards */
+.dashboardHomePage .activityList .activityItem,
+.dashboardHomePage .activityList .activityItem:hover,
+.dashboardHomePage .activityList .activityItem:focus,
+.dashboardHomePage .activityList .activityItem:active {
+  background: linear-gradient(145deg, #122844, #0d1e35) !important;
+  background-color: #122844 !important;
+  border-color: rgba(96,165,250,.18) !important;
+  box-shadow: none !important;
+}
+
+/* Keep Home card text readable */
+.dashboardHomePage .recentTender strong,
+.dashboardHomePage .activityList .activityItem strong {
+  color: #8fb6dc !important;
+}
+
+.dashboardHomePage .recentTender span,
+.dashboardHomePage .recentTender small,
+.dashboardHomePage .activityList .activityItem span {
+  color: #6f91b5 !important;
+}
+
+/* Icons */
+.dashboardHomePage .recentTenderIcon,
+.dashboardHomePage .activityIcon {
+  background: #123a67 !important;
+  color: #8fc5f5 !important;
+}
+
+/* Remove the old white hover effect */
+.dashboardHomePage .recentTender:hover,
+.dashboardHomePage .activityList .activityItem:hover {
+  transform: translateX(3px) !important;
+  filter: none !important;
+}
