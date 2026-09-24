@@ -11886,7 +11886,7 @@ button > * {
 
 .homeContent *,
 .homeContent *::before,
-.homeContent *::after 
+.homeContent *::after {
   /* Home keeps its original styling */
 
 /* =========================================================
@@ -12062,4 +12062,5 @@ aside.sidebar .userCard strong,
 .dashboardHomePage .activityList .activityItem:hover {
   transform: translateX(3px) !important;
   filter: none !important;
+}
 }
