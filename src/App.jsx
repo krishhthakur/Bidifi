@@ -1335,9 +1335,15 @@
         let dpr = 1;
         let paths = [];
         let particles = [];
+        let isVisible = true;
+        let lastFrame = 0;
+        const isTouchDevice = window.matchMedia?.('(hover: none) and (pointer: coarse)')?.matches ?? false;
+        const frameInterval = isTouchDevice ? 1000 / 30 : 0;
 
         const makePaths = () => {
-          const count = Math.max(44, Math.min(90, Math.floor(width / 14)));
+          const count = isTouchDevice
+            ? Math.max(24, Math.min(44, Math.floor(width / 22)))
+            : Math.max(44, Math.min(90, Math.floor(width / 14)));
           paths = Array.from({ length: count }, (_, i) => ({
             side: i % 2 === 0 ? -1 : 1,
             y: 0.10 + Math.random() * 0.80,
@@ -1349,7 +1355,9 @@
             curve: 0.72 + Math.random() * 0.28,
           }));
 
-          particles = Array.from({ length: Math.max(26, Math.floor(width / 28)) }, () => ({
+          particles = Array.from({ length: isTouchDevice
+            ? Math.max(12, Math.floor(width / 42))
+            : Math.max(26, Math.floor(width / 28)) }, () => ({
             side: Math.random() > 0.5 ? -1 : 1,
             y: 0.16 + Math.random() * 0.68,
             phase: Math.random(),
@@ -1384,6 +1392,15 @@
         };
 
         const draw = (time) => {
+          if (!isVisible) {
+            raf = 0;
+            return;
+          }
+          if (frameInterval && time - lastFrame < frameInterval) {
+            raf = window.requestAnimationFrame(draw);
+            return;
+          }
+          lastFrame = time;
           ctx.clearRect(0, 0, width, height);
 
           const cx = width * 0.5;
@@ -1514,12 +1531,24 @@
         };
 
         resize();
-        window.addEventListener("resize", resize);
+        window.addEventListener("resize", resize, { passive: true });
+
+        const observer = typeof IntersectionObserver !== "undefined"
+          ? new IntersectionObserver((entries) => {
+              isVisible = Boolean(entries[0]?.isIntersecting);
+              if (isVisible && !raf) {
+                raf = window.requestAnimationFrame(draw);
+              }
+            }, { threshold: 0.01 })
+          : null;
+
+        observer?.observe(canvas.parentElement || canvas);
         raf = window.requestAnimationFrame(draw);
 
         return () => {
           window.removeEventListener("resize", resize);
           window.cancelAnimationFrame(raf);
+          observer?.disconnect();
         };
       }, []);
 
@@ -1738,7 +1767,9 @@
               position:relative;
               width:100%;
               isolation:isolate;
-              contain:layout style paint;
+              contain:layout paint;
+              overflow:clip;
+              overscroll-behavior:contain;
               transform:translateZ(0);
               will-change:transform;
               backface-visibility:hidden;
@@ -9040,6 +9071,7 @@
             .bidifiHeroTrustRow svg{color:#60a5fa;}
             .bidifiAgentWave{
               position:relative;
+              touch-action:auto;
               width:100%;
               min-height:560px;
               height:100%;
@@ -9055,6 +9087,7 @@
 
             .bidifiAgentWave canvas{
               position:absolute;
+              pointer-events:none;
               inset:0;
               width:100%;
               height:100%;
@@ -9073,6 +9106,7 @@
             }
 
             .bidifiAgentWaveCore{
+              pointer-events:none;
               position:absolute;
               left:50%;
               top:50%;
@@ -9108,6 +9142,7 @@
             }
 
             .bidifiAgentWaveLabel{
+              pointer-events:none;
               position:absolute;
               z-index:5;
               display:grid;
@@ -9152,6 +9187,7 @@
             .labelReport::before{left:-3px;top:50%;transform:translate(-50%,-50%);}
 
             .bidifiAgentWaveBadge{
+              pointer-events:none;
               position:absolute;
               z-index:6;
               top:7%;
@@ -9319,6 +9355,15 @@
               .bidifiCylinderHeroFooter{grid-row:auto;grid-template-columns:repeat(2,minmax(0,1fr));}
             }
             @media(max-width:520px){
+              .bidifiHomeAnimationSection--hero{
+                overflow:clip;
+                contain:layout paint;
+                overscroll-behavior:contain;
+              }
+              .bidifiAgentWave,
+              .bidifiAgentWave canvas{
+                pointer-events:none;
+              }
               .bidifiCylinderHero{border-radius:20px;padding:28px 15px 18px;}
               .bidifiCylinderHero h1{font-size:clamp(36px,11vw,48px);}
               .bidifiCylinderHeroContent>p{font-size:13px;line-height:1.65;}
