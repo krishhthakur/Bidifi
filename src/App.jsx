@@ -215,6 +215,19 @@
           </>
         ),
 
+        sun: (
+          <>
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" />
+          </>
+        ),
+
+        moon: (
+          <>
+            <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.7 8.7 0 1 0 20.5 14.2Z" />
+          </>
+        ),
+
         plus: (
           <>
             <line x1="12" y1="5" x2="12" y2="19" />
@@ -2417,6 +2430,7 @@
         { name: "AI Verification", icon: "verify" },
         { name: "Bid Readiness", icon: "verify" },
         { name: "Reports", icon: "report" },
+        { name: "Roadmap", icon: "arrow" },
       ];
 
       return (
@@ -2539,6 +2553,10 @@
       onOpenNotifications,
       onClearNotifications,
       onRemoveNotification,
+      language = "English",
+      onLanguageChange,
+      theme = "dark",
+      onThemeToggle,
     }) {
       const [searchQuery, setSearchQuery] = useState("");
       const [searchOpen, setSearchOpen] = useState(false);
@@ -2664,6 +2682,17 @@
           </div>
 
           <div className="topbarActions">
+            <label className="bidifiPreferenceControl" title="Change language">
+              <span aria-hidden="true">文</span>
+              <select aria-label="Change language" value={language} onChange={(event) => onLanguageChange?.(event.target.value)}>
+                <option value="English">EN</option>
+                <option value="Hindi">हिंदी</option>
+              </select>
+            </label>
+            <button type="button" className="bidifiThemeToggle" onClick={onThemeToggle} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
+              <Icon name={theme === "dark" ? "sun" : "moon"} size={16} />
+              <span>{theme === "dark" ? "Light" : "Dark"}</span>
+            </button>
             <div
               className="searchBox"
               ref={searchBoxRef}
@@ -7186,10 +7215,171 @@
     }
 
     /* =========================================================
+       ROADMAP
+       Shows implemented, in-progress and planned BIDIFI capabilities.
+    ========================================================= */
+    function RoadmapPage() {
+      const phases = [
+        {
+          number: "01",
+          title: "Core Platform",
+          status: "Core workflow",
+          description: "The foundation of BIDIFI's tender and bidder compliance workflow.",
+          items: [
+            "Tender document upload and Tender Library",
+            "Tender requirement extraction",
+            "Clause-by-clause bidder evidence comparison",
+            "Compliance percentage and risk analysis",
+          ],
+        },
+        {
+          number: "02",
+          title: "Improved Analysis",
+          status: "Planned improvements",
+          description: "Make document analysis clearer and more reliable across different tender formats.",
+          items: [
+            "Improved handling of complex and scanned tender documents",
+            "Clearer explanations for each compliance result",
+            "Better missing-document detection",
+            "More detailed compliance reports",
+          ],
+        },
+        {
+          number: "03",
+          title: "Workflow & Collaboration",
+          status: "Planned",
+          description: "Help teams organize tender reviews and share findings more easily.",
+          items: [
+            "Tender tracking and organized workspaces",
+            "Report export and sharing improvements",
+            "Team review and collaboration workflows",
+          ],
+        },
+        {
+          number: "04",
+          title: "Advanced Intelligence",
+          status: "Future direction",
+          description: "Expand analysis and automation as the platform evolves.",
+          items: [
+            "Advanced document analysis",
+            "Historical tender insights and analytics",
+            "Additional bid-preparation automation",
+          ],
+        },
+      ];
+
+      return (
+        <>
+          <PageHeader
+            eyebrow="PRODUCT DIRECTION"
+            title="BIDIFI Roadmap"
+            description="A transparent view of the platform's current workflow and planned improvements. Planned items are not presented as available features."
+          />
+          <section style={{ display: "grid", gap: 16, maxWidth: 1050 }}>
+            {phases.map((phase, index) => (
+              <article key={phase.number} className="panel" style={{ padding: 22, display: "grid", gridTemplateColumns: "64px minmax(0,1fr)", gap: 18 }}>
+                <div style={{ width: 54, height: 54, borderRadius: 16, display: "grid", placeItems: "center", fontSize: 18, fontWeight: 800, color: "#2563eb", background: "rgba(37,99,235,.10)", border: "1px solid rgba(37,99,235,.18)" }}>{phase.number}</div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, marginBottom: 7 }}>
+                    <h2 style={{ margin: 0, fontSize: 19 }}>{phase.title}</h2>
+                    <span style={{ fontSize: 11, fontWeight: 750, borderRadius: 999, padding: "5px 9px", background: index === 0 ? "rgba(22,163,74,.10)" : "rgba(100,116,139,.10)", color: index === 0 ? "#15803d" : "var(--muted,#64748b)" }}>{phase.status}</span>
+                  </div>
+                  <p style={{ margin: "0 0 14px", color: "var(--muted,#64748b)", lineHeight: 1.6 }}>{phase.description}</p>
+                  <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, lineHeight: 1.55 }}>
+                    {phase.items.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                </div>
+              </article>
+            ))}
+          </section>
+        </>
+      );
+    }
+
+    /* =========================================================
        APP
     ========================================================= */
+    const BIDIFI_HINDI_TEXT = {
+      "Home": "होम", "Tenders": "टेंडर", "Tender Library": "टेंडर लाइब्रेरी",
+      "Bidder Workspace": "बिडर वर्कस्पेस", "AI Verification": "AI सत्यापन",
+      "Bid Readiness": "बिड तैयारी", "Reports": "रिपोर्ट्स", "Roadmap": "रोडमैप",
+      "Product Roadmap": "प्रोडक्ट रोडमैप", "Settings": "सेटिंग्स",
+      "Account & Settings": "अकाउंट और सेटिंग्स", "WORKSPACE": "वर्कस्पेस",
+      "System status": "सिस्टम स्थिति", "AI compliance engine is online.": "AI कंप्लायंस इंजन ऑनलाइन है।",
+      "Backend connection unavailable.": "बैकएंड कनेक्शन उपलब्ध नहीं है।",
+      "Search workspace...": "वर्कस्पेस खोजें...", "Quick Links": "त्वरित लिंक",
+      "Workspace": "वर्कस्पेस", "Built for clearer, more structured bid compliance review.": "बिड कंप्लायंस समीक्षा को अधिक स्पष्ट और व्यवस्थित बनाने के लिए।",
+      "AI-assisted tender and bid compliance workspace.": "AI-सहायता प्राप्त टेंडर और बिड कंप्लायंस वर्कस्पेस।",
+      "BIDIFI supports document review and compliance assessment. Always verify findings against the original tender requirements before making submission decisions.": "BIDIFI दस्तावेज़ समीक्षा और कंप्लायंस आकलन में सहायता करता है। सबमिशन का निर्णय लेने से पहले निष्कर्षों को मूल टेंडर आवश्यकताओं से सत्यापित करें।",
+      "LANGUAGE": "भाषा", "APPEARANCE": "दिखावट", "English": "अंग्रेज़ी", "Hindi": "हिंदी",
+      "Light": "लाइट", "Dark": "डार्क", "System default": "सिस्टम डिफ़ॉल्ट",
+      "Change language": "भाषा बदलें", "Switch to dark mode": "डार्क मोड चालू करें",
+      "Switch to light mode": "लाइट मोड चालू करें", "All rights reserved.": "सर्वाधिकार सुरक्षित।",
+      "AI BID COMPLIANCE": "AI बिड कंप्लायंस", "Notifications": "सूचनाएँ",
+      "Upload Tender": "टेंडर अपलोड करें", "Upload tender": "टेंडर अपलोड करें",
+      "Extract Requirements": "आवश्यकताएँ निकालें", "No tenders uploaded yet": "अभी तक कोई टेंडर अपलोड नहीं हुआ",
+      "Please wait...": "कृपया प्रतीक्षा करें...", "Save settings": "सेटिंग्स सेव करें",
+      "Tender document upload and Tender Library": "टेंडर दस्तावेज़ अपलोड और टेंडर लाइब्रेरी",
+    };
+
+    function translateBidifiText(text, language) {
+      const trimmed = String(text ?? "").trim();
+      if (!trimmed) return text;
+      const reverse = Object.fromEntries(Object.entries(BIDIFI_HINDI_TEXT).map(([english, hindi]) => [hindi, english]));
+      const translated = language === "Hindi" ? BIDIFI_HINDI_TEXT[trimmed] : reverse[trimmed];
+      if (!translated) return text;
+      const leading = String(text).match(/^\s*/)?.[0] || "";
+      const trailing = String(text).match(/\s*$/)?.[0] || "";
+      return leading + translated + trailing;
+    }
+
     export default function App() {
       const [activePage, setActivePage] = useState("Home");
+      const [language, setLanguage] = useState(() => window.localStorage.getItem("bidifi_language") || "English");
+      const [theme, setTheme] = useState(() => window.localStorage.getItem("bidifi_theme") || "dark");
+
+      useEffect(() => {
+        document.documentElement.setAttribute("data-theme", theme === "light" ? "light" : "dark");
+        document.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
+        window.localStorage.setItem("bidifi_theme", theme);
+      }, [theme]);
+
+      useEffect(() => {
+        window.localStorage.setItem("bidifi_language", language);
+        document.documentElement.lang = language === "Hindi" ? "hi" : "en";
+        // Translate matching interface labels as they render, without altering unknown user data.
+        const applyTranslations = (root) => {
+          const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT);
+          const nodes = [];
+          while (walker.nextNode()) nodes.push(walker.currentNode);
+          nodes.forEach((node) => {
+            const original = node.nodeValue || "";
+            const translated = translateBidifiText(original, language);
+            if (translated !== original) node.nodeValue = translated;
+          });
+          (root || document.body).querySelectorAll?.("input[placeholder],button[aria-label],select[aria-label]").forEach((el) => {
+            if (el.dataset.bidifiOriginalLabel === undefined) el.dataset.bidifiOriginalLabel = el.getAttribute("placeholder") || el.getAttribute("aria-label") || "";
+            const current = el.getAttribute("placeholder") || el.getAttribute("aria-label") || "";
+            const original = el.dataset.bidifiOriginalLabel;
+            const translated = language === "Hindi" ? translateBidifiText(original, language) : translateBidifiText(current, language);
+            if (el.hasAttribute("placeholder")) el.setAttribute("placeholder", translated);
+            if (el.hasAttribute("aria-label")) el.setAttribute("aria-label", translated);
+          });
+        };
+        applyTranslations(document.body);
+        const observer = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.type === "childList") mutation.addedNodes.forEach((node) => { if (node.nodeType === 1 || node.nodeType === 3) applyTranslations(node.nodeType === 1 ? node : node.parentElement); });
+            else if (mutation.type === "characterData") {
+              const original = mutation.target.nodeValue || "";
+              const translated = translateBidifiText(original, language);
+              if (translated !== original) mutation.target.nodeValue = translated;
+            }
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+        return () => observer.disconnect();
+      }, [language]);
 
       const [currentUser, setCurrentUser] = useState(() => {
         try {
@@ -7541,6 +7731,7 @@
           "Bidder Analysis",
           "AI Verification",
           "Reports",
+          "Roadmap",
           "Settings",
         ];
 
@@ -7695,8 +7886,9 @@
         clearAlerts();
 
         try {
+          const filesBeingUploaded = [...selectedTenderFiles];
           const formData = new FormData();
-          selectedTenderFiles.forEach((file) => formData.append("tenders", file));
+          filesBeingUploaded.forEach((file) => formData.append("tenders", file));
           formData.append("uploadedBy", JSON.stringify({
             userId: currentUser?.id || null,
             name: currentUser?.name || tenderUploaderInfo.contactName || "",
@@ -7707,64 +7899,169 @@
             registrationNumber: tenderUploaderInfo.registrationNumber || ""
           }));
 
-          // IMPORTANT: upload request is now fast. The backend no longer waits for
-          // an LLM. It returns immediately after text extraction/local parsing.
           const data = await fetchJson(`${API_URL}/api/upload-tenders`, {
             method: "POST",
             body: formData
           });
 
-          const uploaded = Array.isArray(data.tenders)
-            ? data.tenders
-            : Array.isArray(data.files)
-              ? data.files
-              : [];
+          // Accept the common response shapes used by the existing API. The old
+          // code only read data.tenders / data.files, which could reject a valid
+          // upload when the backend returned a single tender or nested data.
+          const responseBody = data?.data || data?.result || data;
+          let uploaded = [];
+          if (Array.isArray(data?.tenders)) uploaded = data.tenders;
+          else if (Array.isArray(data?.files)) uploaded = data.files;
+          else if (Array.isArray(responseBody?.tenders)) uploaded = responseBody.tenders;
+          else if (Array.isArray(responseBody?.files)) uploaded = responseBody.files;
+          else if (data?.tender && typeof data.tender === "object") uploaded = [data.tender];
+          else if (responseBody?.tender && typeof responseBody.tender === "object") uploaded = [responseBody.tender];
+          else if (data?.record && typeof data.record === "object") uploaded = [data.record];
+          else if (responseBody?.id || responseBody?.tenderId) uploaded = [responseBody];
 
-          const successfulUploaded = uploaded.filter(
-            (item) => item?.id && String(item?.status || "UPLOADED").toUpperCase() !== "ERROR"
-          );
-          const failedUploaded = uploaded.filter(
-            (item) => !item?.id || String(item?.status || "").toUpperCase() === "ERROR"
-          );
+          const normalizeTender = (item) => {
+            if (!item || typeof item !== "object") return null;
+            const id = item.id ?? item.tenderId ?? item.tender_id ?? item._id;
+            if (id === undefined || id === null || String(id).trim() === "") return null;
+            const filename = item.filename || item.fileName || item.originalname || item.originalName || item.name || item.title || "Untitled tender";
+            return {
+              ...item,
+              id,
+              name: item.name || item.title || filename,
+              filename,
+              requirements: Array.isArray(item.requirements) ? item.requirements : [],
+            };
+          };
+
+          let successfulUploaded = uploaded
+            .map(normalizeTender)
+            .filter((item) => item && String(item.status || "UPLOADED").toUpperCase() !== "ERROR");
+          const failedUploaded = uploaded.filter((item) => !normalizeTender(item) || String(item?.status || "").toUpperCase() === "ERROR");
+
+          // If the upload endpoint confirms success but does not return the
+          // record in its response, reload the persisted workspace and match the
+          // new records by filename. This also repairs the library display when
+          // the API response shape differs from the frontend's previous assumption.
+          if (!successfulUploaded.length) {
+            try {
+              const workspace = await fetchJson(`${API_URL}/api/workspace`);
+              const workspaceTenders = Array.isArray(workspace?.tenders) ? workspace.tenders : [];
+              const previousIds = new Set(tenders.map((item) => String(item?.id)));
+              const newlyFound = workspaceTenders.filter((item) => {
+                if (!item?.id || previousIds.has(String(item.id))) return false;
+                const candidateName = String(item.filename || item.fileName || item.name || item.title || "").toLowerCase();
+                return filesBeingUploaded.some((file) => candidateName === file.name.toLowerCase());
+              });
+              successfulUploaded = newlyFound.map(normalizeTender).filter(Boolean);
+            } catch {
+              // Preserve the original upload error below if the workspace cannot be read.
+            }
+          }
 
           if (!successfulUploaded.length) {
             const details = failedUploaded
-              .map((item) => `${safeText(item?.filename, "Tender")}: ${safeText(item?.error, "processing failed")}`)
+              .map((item) => `${safeText(item?.filename || item?.fileName || item?.name, "Tender")}: ${safeText(item?.error || item?.message, "processing failed")}`)
               .join(" | ");
-            throw new Error(details || "Upload succeeded but no tender record was returned.");
+            throw new Error(details || "The upload endpoint did not return a tender record, and the saved tender could not be found in the workspace. Check the backend upload/database response.");
+          }
+
+          // Load each saved record to ensure we use the database version and its
+          // persisted requirements, rather than only the partial upload response.
+          const recordsWithDetails = await Promise.all(successfulUploaded.map(async (item) => {
+            try {
+              const detail = await fetchJson(`${API_URL}/api/tenders/${encodeURIComponent(item.id)}`);
+              const full = detail?.tender || detail?.data?.tender || detail?.data || detail?.result || detail;
+              if (full && typeof full === "object" && (full.id || full.tenderId || full._id)) {
+                return normalizeTender({ ...item, ...full, id: full.id ?? full.tenderId ?? full._id ?? item.id });
+              }
+            } catch {
+              // The upload response still contains a usable saved record.
+            }
+            return item;
+          }));
+
+          let extractedCount = 0;
+          const extractionFailures = [];
+          const processedTenders = [];
+
+          for (const tender of recordsWithDetails) {
+            let currentTender = tender;
+            let extracted = Array.isArray(tender.requirements) ? tender.requirements : [];
+
+            // Requirements may not be included in the upload response. In that
+            // case, invoke the app's existing extraction endpoint using the saved
+            // tender ID, then store the returned requirements in React state.
+            if (!extracted.length) {
+              try {
+                const extractionData = await fetchJson(`${API_URL}/api/extract-requirements`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    tenderId: tender.id,
+                    tenderName: tender.name || tender.filename || "",
+                    text: "",
+                  }),
+                });
+                const extractionResult = parseResponseValue(extractionData);
+                extracted = safeArray(extractionResult?.requirements || extractionData?.requirements);
+                if (!extracted.length) {
+                  extractionFailures.push(tender.name || tender.filename || "Tender");
+                } else {
+                  extractedCount += 1;
+                }
+                currentTender = {
+                  ...tender,
+                  requirements: extracted,
+                  aiExtraction: extractionResult?.aiExtraction || extractionResult?.tenderSummary || tender.aiExtraction || null,
+                };
+              } catch {
+                extractionFailures.push(tender.name || tender.filename || "Tender");
+              }
+            } else {
+              extractedCount += 1;
+            }
+
+            processedTenders.push(currentTender);
           }
 
           setTenders((prev) => {
-            const existingIds = new Set(prev.map((item) => item.id));
-            return [
-              ...successfulUploaded.filter((item) => !existingIds.has(item.id)),
-              ...prev
-            ];
+            const byId = new Map(prev.map((item) => [String(item.id), item]));
+            processedTenders.forEach((item) => byId.set(String(item.id), { ...byId.get(String(item.id)), ...item }));
+            return Array.from(byId.values());
           });
 
-          const firstTender = successfulUploaded[0];
+          const firstTender = processedTenders[0];
           setSelectedTender(firstTender);
-          const fastRequirements = Array.isArray(firstTender.requirements)
-            ? firstTender.requirements
-            : [];
-          setRequirements(fastRequirements);
+          setRequirements(Array.isArray(firstTender.requirements) ? firstTender.requirements : []);
           setAnalysis(null);
           setSelectedTenderFiles([]);
 
-          const warning = failedUploaded.length
-            ? ` ${failedUploaded.length} tender${failedUploaded.length === 1 ? "" : "s"} could not be processed.`
-            : "";
-          showMessage(
-            `${successfulUploaded.length} tender${successfulUploaded.length === 1 ? "" : "s"} uploaded successfully.${warning} Refining requirements...`
-          );
+          // Refresh persisted workspace after upload so the Tender Library stays
+          // synchronized with the backend database.
+          try {
+            const workspace = await fetchJson(`${API_URL}/api/workspace`);
+            if (Array.isArray(workspace?.tenders)) {
+              setTenders((prev) => {
+                const byId = new Map(prev.map((item) => [String(item.id), item]));
+                workspace.tenders.forEach((item) => {
+                  if (item?.id) byId.set(String(item.id), { ...byId.get(String(item.id)), ...item });
+                });
+                return Array.from(byId.values());
+              });
+            }
+          } catch {
+            // The successful upload record already remains visible in local state.
+          }
 
-          // The backend now returns the final grounded requirement list in the
-          // same upload response. Do not start a second extraction request here.
-          // This removes the race where the first tender could disappear/revert
-          // and also prevents duplicate REQ rows from AI + local merging.
-          showMessage(
-            `${successfulUploaded.length} tender${successfulUploaded.length === 1 ? "" : "s"} uploaded and requirements extracted successfully.${warning}`
-          );
+          const warningParts = [];
+          if (failedUploaded.length) warningParts.push(`${failedUploaded.length} file(s) could not be processed`);
+          if (extractionFailures.length) warningParts.push(`requirements could not be extracted for ${extractionFailures.join(", ")}`);
+          const warning = warningParts.length ? ` Warning: ${warningParts.join("; ")}.` : "";
+
+          if (extractionFailures.length) {
+            showError(`${processedTenders.length} tender${processedTenders.length === 1 ? "" : "s"} uploaded and saved to the Tender Library, but requirements extraction did not complete for every tender.${warning}`);
+          } else {
+            showMessage(`${processedTenders.length} tender${processedTenders.length === 1 ? "" : "s"} uploaded and saved to the Tender Library. Requirements extracted for ${extractedCount} tender${extractedCount === 1 ? "" : "s"}.${warning}`);
+          }
         } catch (err) {
           showError(err.message || "Tender upload failed. Check that the backend is running.");
         } finally {
@@ -8896,6 +9193,9 @@
                 />
               );
 
+            case "Roadmap":
+              return <RoadmapPage />;
+
             case "Settings":
               return <SettingsPage currentUser={currentUser} onLogin={() => { setAuthMode("login"); setAuthOpen(true); }} onLogout={handleLogout} />;
 
@@ -8988,6 +9288,40 @@
       return (
         <>
           <style>{`
+            .bidifiSiteFooter{margin:28px 24px 0;padding:25px 26px 16px;border:1px solid rgba(96,165,250,.20);border-radius:18px;background:linear-gradient(135deg,#0a1426 0%,#101d37 58%,#142344 100%);color:#e7eefc;box-shadow:0 14px 38px rgba(2,8,23,.18);}
+            .bidifiSiteFooter .bidifiFooterBrand>strong{color:#f8fbff;}
+            .bidifiSiteFooter .bidifiFooterBrand p,.bidifiSiteFooter .bidifiFooterLinks button,.bidifiSiteFooter .bidifiFooterBottom{color:#aebed8;}
+            .bidifiSiteFooter .bidifiFooterLinks strong{color:#f1f6ff;}
+            .bidifiSiteFooter .bidifiFooterBottom{border-top-color:rgba(148,163,184,.22);}
+            .bidifiPreferenceControl,.bidifiThemeToggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:0 9px;border:1px solid var(--border,rgba(148,163,184,.25));border-radius:9px;background:var(--panel,rgba(255,255,255,.06));color:var(--text,inherit);font:600 12px system-ui,sans-serif;}
+            .bidifiPreferenceControl select{border:0;outline:0;background:transparent;color:inherit;font:inherit;cursor:pointer;max-width:58px;}
+            .bidifiPreferenceControl option{background:#101827;color:#f8fafc;}
+            .bidifiThemeToggle{cursor:pointer;white-space:nowrap;}
+            .bidifiThemeToggle:hover{border-color:#60a5fa;}
+            :root[data-theme="dark"] body{background:#07111f;color:#e5edf9;}
+            :root[data-theme="dark"] .app,:root[data-theme="dark"] .mainArea,:root[data-theme="dark"] .content{background-color:#07111f;color:#e5edf9;}
+            :root[data-theme="dark"] .topbar,:root[data-theme="dark"] .sidebar{background:#0b1628;color:#e5edf9;border-color:rgba(148,163,184,.18);}
+            :root[data-theme="dark"] .panel,:root[data-theme="dark"] .statCard,:root[data-theme="dark"] .workflowPanel,:root[data-theme="dark"] .searchDropdown{background-color:#101d31;color:#e5edf9;border-color:rgba(148,163,184,.20);}
+            :root[data-theme="dark"] .bidifiSiteFooter{background:linear-gradient(135deg,#0a1426 0%,#101d37 58%,#142344 100%);color:#e7eefc;}
+            :root[data-theme="light"] body,:root[data-theme="light"] .app,:root[data-theme="light"] .mainArea,:root[data-theme="light"] .content{background:#f5f8fd;color:#172033;}
+            :root[data-theme="light"] .topbar,:root[data-theme="light"] .sidebar{background:#fff;color:#172033;}
+            :root[data-theme="light"] .panel,:root[data-theme="light"] .statCard,:root[data-theme="light"] .workflowPanel{background-color:#fff;color:#172033;}
+            :root[data-theme="light"] .bidifiSiteFooter{background:linear-gradient(135deg,#e8effb 0%,#dce8fa 100%);border-color:#cbd9ee;color:#172033;box-shadow:0 10px 30px rgba(15,23,42,.06);}
+            :root[data-theme="light"] .bidifiSiteFooter .bidifiFooterBrand>strong,:root[data-theme="light"] .bidifiSiteFooter .bidifiFooterLinks strong{color:#172033;}
+            :root[data-theme="light"] .bidifiSiteFooter .bidifiFooterBrand p,:root[data-theme="light"] .bidifiSiteFooter .bidifiFooterLinks button,:root[data-theme="light"] .bidifiSiteFooter .bidifiFooterBottom{color:#53647f;}
+            @media(max-width:900px){.bidifiPreferenceControl{padding:0 6px}.bidifiThemeToggle{padding:0 8px}.bidifiThemeToggle span{display:none;}}
+            @media(max-width:560px){.bidifiPreferenceControl>span{display:none}.bidifiPreferenceControl select{max-width:46px}.topbarActions{gap:6px!important;}}
+            .bidifiFooterMain{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(130px,.7fr) minmax(150px,.8fr);gap:30px;padding-bottom:22px;}
+            .bidifiFooterBrand>strong{font-size:20px;letter-spacing:.1em;font-weight:900;color:var(--text,#172033);}
+            .bidifiFooterBrand p{margin:8px 0 0;color:var(--muted,#64748b);font-size:12px;line-height:1.65;}
+            .bidifiFooterBrand .bidifiFooterNotice{max-width:470px;margin-top:12px;font-size:11px;}
+            .bidifiFooterLinks{display:flex;flex-direction:column;align-items:flex-start;gap:9px;}
+            .bidifiFooterLinks strong{margin-bottom:3px;font-size:12px;font-weight:800;}
+            .bidifiFooterLinks button{padding:0;border:0;background:transparent;color:var(--muted,#64748b);font:inherit;font-size:11.5px;text-align:left;cursor:pointer;}
+            .bidifiFooterLinks button:hover{color:var(--accent,#4f46e5);text-decoration:underline;}
+            .bidifiFooterBottom{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--border,rgba(148,163,184,.22));padding-top:14px;color:var(--muted,#64748b);font-size:10.5px;line-height:1.6;}
+            @media(max-width:760px){.bidifiSiteFooter{margin:22px 12px 0;padding:20px 17px 14px;}.bidifiFooterMain{grid-template-columns:1fr 1fr;gap:22px;}.bidifiFooterBrand{grid-column:1/-1;}.bidifiFooterBottom{flex-direction:column;gap:5px;}}
+            @media(max-width:420px){.bidifiFooterMain{grid-template-columns:1fr;}.bidifiFooterBrand{grid-column:auto;}}
             .entityInfoPanel{margin-bottom:18px;}
             .infoGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
             .infoGrid label{display:grid;gap:7px;font-size:12px;font-weight:700;color:var(--muted,#64748b);}
@@ -10975,11 +11309,46 @@ button, input, textarea, select { max-width:100%; }
               onOpenNotifications={markNotificationsRead}
               onClearNotifications={clearNotifications}
               onRemoveNotification={removeNotification}
+              language={language}
+              onLanguageChange={setLanguage}
+              theme={theme}
+              onThemeToggle={() => setTheme((current) => current === "dark" ? "light" : "dark")}
             />
 
             <main className={"content " + (activePage === "Home" ? "homeContent" : "blueWorkspaceContent " + (activePage === "Bid Readiness" ? "bidReadinessPage" : "blueWorkspacePage"))}>
               {pageContent}
             </main>
+
+            <footer className="bidifiSiteFooter">
+              <div className="bidifiFooterMain">
+                <div className="bidifiFooterBrand">
+                  <strong>BIDIFI</strong>
+                  <p>AI-assisted tender and bid compliance workspace.</p>
+                  <p className="bidifiFooterNotice">BIDIFI supports document review and compliance assessment. Always verify findings against the original tender requirements before making submission decisions.</p>
+                </div>
+
+                <div className="bidifiFooterLinks">
+                  <strong>Quick Links</strong>
+                  <button type="button" onClick={() => navigate("Home")}>Home</button>
+                  <button type="button" onClick={() => navigate("Tenders")}>Tender Library</button>
+                  <button type="button" onClick={() => navigate("Reports")}>Reports</button>
+                  <button type="button" onClick={() => navigate("Roadmap")}>Product Roadmap</button>
+                </div>
+
+                <div className="bidifiFooterLinks">
+                  <strong>Workspace</strong>
+                  <button type="button" onClick={() => navigate("Bidder Workspace")}>Bidder Workspace</button>
+                  <button type="button" onClick={() => navigate("AI Verification")}>AI Verification</button>
+                  <button type="button" onClick={() => navigate("Bid Readiness")}>Bid Readiness</button>
+                  <button type="button" onClick={() => navigate("Settings")}>Account & Settings</button>
+                </div>
+              </div>
+
+              <div className="bidifiFooterBottom">
+                <span>© {new Date().getFullYear()} BIDIFI. All rights reserved.</span>
+                <span>Built for clearer, more structured bid compliance review.</span>
+              </div>
+            </footer>
           </div>
 
           <BidifiAIChat />

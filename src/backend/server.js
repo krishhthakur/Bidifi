@@ -1,4 +1,4 @@
-﻿    /* ============================================================
+    /* ============================================================
        BIDIFI AI BID COMPLIANCE ENGINE
        Evidence-grounded deterministic validation
        Generic tender + multi-bidder support
@@ -477,6 +477,108 @@
       ensureUsersFile();
       fs.writeFileSync(USERS_FILE, JSON.stringify(Array.isArray(users) ? users : [], null, 2), "utf8");
     }
+
+    /* ============================================================
+       TENDER & WORKSPACE PERSISTENCE
+       ============================================================ */
+
+    const TENDERS_FILE = path.join(DATA_DIR, "tenders.json");
+    const WORKSPACE_FILE = path.join(DATA_DIR, "workspace.json");
+
+    function ensureTendersFile() {
+      if (!fs.existsSync(TENDERS_FILE)) {
+        const seedPath = path.join(ROOT_DIR, "data", "tenders.json");
+        if (fs.existsSync(seedPath) && seedPath !== TENDERS_FILE) {
+          try {
+            fs.copyFileSync(seedPath, TENDERS_FILE);
+            return;
+          } catch (_) {}
+        }
+        try {
+          fs.writeFileSync(TENDERS_FILE, "[]", "utf8");
+        } catch (_) {}
+      }
+    }
+
+    function readTendersFromDisk() {
+      ensureTendersFile();
+      try {
+        if (!fs.existsSync(TENDERS_FILE)) return [];
+        const raw = fs.readFileSync(TENDERS_FILE, "utf8");
+        const parsed = JSON.parse(raw || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        console.warn("[BIDIFI STORAGE] Could not read tenders.json:", error?.message);
+        return [];
+      }
+    }
+
+    function saveTenderStore() {
+      try {
+        ensureTendersFile();
+        const tenders = [...tenderStore.values()];
+        fs.writeFileSync(TENDERS_FILE, JSON.stringify(tenders, null, 2), "utf8");
+
+        try {
+          let workspace = {};
+          if (fs.existsSync(WORKSPACE_FILE)) {
+            workspace = JSON.parse(fs.readFileSync(WORKSPACE_FILE, "utf8") || "{}");
+          }
+          workspace.tenders = tenders;
+          workspace.bidders = [...bidderStore.values()];
+          workspace.analyses = [...analysisStore.values()];
+          fs.writeFileSync(WORKSPACE_FILE, JSON.stringify(workspace, null, 2), "utf8");
+        } catch (wsErr) {
+          console.warn("[BIDIFI STORAGE] Could not sync workspace.json:", wsErr?.message);
+        }
+      } catch (error) {
+        console.error("[BIDIFI STORAGE] Failed to persist tenders to disk:", error);
+      }
+    }
+
+    function loadInitialStores() {
+      try {
+        const diskTenders = readTendersFromDisk();
+        for (const tender of diskTenders) {
+          if (tender?.id) {
+            tenderStore.set(tender.id, tender);
+          }
+        }
+
+        if (fs.existsSync(WORKSPACE_FILE)) {
+          try {
+            const ws = JSON.parse(fs.readFileSync(WORKSPACE_FILE, "utf8") || "{}");
+            if (Array.isArray(ws.tenders)) {
+              for (const t of ws.tenders) {
+                if (t?.id && !tenderStore.has(t.id)) {
+                  tenderStore.set(t.id, t);
+                }
+              }
+            }
+            if (Array.isArray(ws.bidders)) {
+              for (const b of ws.bidders) {
+                if (b?.id && !bidderStore.has(b.id)) {
+                  bidderStore.set(b.id, b);
+                }
+              }
+            }
+            if (Array.isArray(ws.analyses)) {
+              for (const a of ws.analyses) {
+                if (a?.id && !analysisStore.has(a.id)) {
+                  analysisStore.set(a.id, a);
+                }
+              }
+            }
+          } catch (_) {}
+        }
+        console.log(`[BIDIFI STORAGE] Initialized with ${tenderStore.size} tender(s), ${bidderStore.size} bidder(s).`);
+      } catch (err) {
+        console.error("[BIDIFI STORAGE] Error initializing stores:", err);
+      }
+    }
+
+    loadInitialStores();
+
 
     function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
       const hash = crypto.scryptSync(String(password), salt, 64).toString("hex");
@@ -1107,6 +1209,65 @@ PDF page count reported by parser: ${maxPages}.
       }
     }
 
+    async function parsePdfBuffer(buffer) {
+      if (!buffer || !Buffer.isBuffer(buffer)) {
+        throw new Error("Invalid PDF buffer provided.");
+      }
+
+      let lastError = null;
+
+      // 1. pdf-parse v2 (class export PDFParse)
+      if (pdfParse && typeof pdfParse.PDFParse === "function") {
+        try {
+          const parser = new pdfParse.PDFParse({ data: buffer });
+          try {
+            const result = await parser.getText();
+            const text = safeString(result?.text);
+            const pages = Number(result?.total) || (Array.isArray(result?.pages) ? result.pages.length : 1);
+            return { text, numpages: pages };
+          } finally {
+            if (typeof parser.destroy === "function") {
+              try { await parser.destroy(); } catch (_) {}
+            }
+          }
+        } catch (err) {
+          lastError = err;
+        }
+      }
+
+      // 2. pdf-parse v1 (function export)
+      if (typeof pdfParse === "function") {
+        try {
+          const result = await pdfParse(buffer);
+          return {
+            text: safeString(result?.text),
+            numpages: Number(result?.numpages) || 1
+          };
+        } catch (err) {
+          lastError = err;
+        }
+      }
+
+      // 3. pdfParse.default
+      if (pdfParse && typeof pdfParse.default === "function") {
+        try {
+          const result = await pdfParse.default(buffer);
+          return {
+            text: safeString(result?.text),
+            numpages: Number(result?.numpages) || 1
+          };
+        } catch (err) {
+          lastError = err;
+        }
+      }
+
+      if (lastError) {
+        throw new Error(`Failed to parse PDF document: ${lastError?.message || String(lastError)}`);
+      }
+
+      throw new Error("pdf-parse package is not installed or available.");
+    }
+
     async function extractFileContent(
       file,
       options = {}
@@ -1158,7 +1319,7 @@ PDF page count reported by parser: ${maxPages}.
           );
 
         const parsed =
-          await pdfParse(
+          await parsePdfBuffer(
             buffer
           );
 
@@ -12261,6 +12422,8 @@ PDF page count reported by parser: ${maxPages}.
       if (!openai || path.extname(file.originalname || "").toLowerCase() !== ".pdf") {
         tender.ocrPending = false;
         tender.extractionStatus = tender.requirements?.length ? "READY" : "TEXT_READY";
+        tenderStore.set(tender.id, tender);
+        saveTenderStore();
         return;
       }
 
@@ -12290,9 +12453,13 @@ PDF page count reported by parser: ${maxPages}.
 
         tender.ocrPending = false;
         tender.ocrCompletedAt = nowIso();
+        tenderStore.set(tender.id, tender);
+        saveTenderStore();
         console.log(`[BIDIFI] Background OCR completed for ${tender.id}.`);
       } catch (error) {
         tender.ocrPending = false;
+        tenderStore.set(tender.id, tender);
+        saveTenderStore();
         console.warn(`[BIDIFI] Background OCR failed for ${tender.id}:`, error?.message || error);
       }
     }
@@ -12317,9 +12484,7 @@ PDF page count reported by parser: ${maxPages}.
       const results = await Promise.all(
         safeArray(files).map(async (file) => {
           try {
-            // Do not block the upload response on visual OCR. The tender is
-            // inserted into the library first; scanned-PDF OCR continues in
-            // the background and enriches the same tender object.
+            // Extract text from uploaded document (supports PDF, DOCX, TXT)
             const content = await extractFileContent(file, { skipVisionOCR: true });
             const sourceText = safeString(content.text).trim();
             const hasUsableText = sourceText.length >= 20;
@@ -12344,7 +12509,19 @@ PDF page count reported by parser: ${maxPages}.
                   id: `REQ-${String(index + 1).padStart(2, "0")}`
                 }));
 
-            const id = createId("tender");
+            // Check for duplicate or re-uploaded tender (same filename and similar text size)
+            let existingTender = null;
+            for (const existing of tenderStore.values()) {
+              if (
+                existing.filename === file.originalname &&
+                Math.abs(safeString(existing.text).length - sourceText.length) < 20
+              ) {
+                existingTender = existing;
+                break;
+              }
+            }
+
+            const id = existingTender ? existingTender.id : createId("tender");
             const tender = {
               id,
               filename: file.originalname,
@@ -12361,9 +12538,9 @@ PDF page count reported by parser: ${maxPages}.
                 : (content.ocrPending ? "pending background OCR" : "deterministic requirement extraction"),
               ocrPending: Boolean(content.ocrPending),
               ocrUsed: Boolean(content.ocrUsed),
-              tenderSummary: "",
-              tenderTitle: "",
-              issuingAuthority: "",
+              tenderSummary: existingTender?.tenderSummary || "",
+              tenderTitle: existingTender?.tenderTitle || "",
+              issuingAuthority: existingTender?.issuingAuthority || "",
               uploadedBy: {
                 userId: safeString(uploadedBy?.userId).trim() || null,
                 name: safeString(uploadedBy?.name).trim(),
@@ -12373,14 +12550,15 @@ PDF page count reported by parser: ${maxPages}.
                 gstin: safeString(uploadedBy?.gstin).trim(),
                 registrationNumber: safeString(uploadedBy?.registrationNumber).trim()
               },
-              uploadedAt: nowIso()
+              uploadedAt: existingTender ? existingTender.uploadedAt : nowIso(),
+              updatedAt: nowIso(),
+              status: "UPLOADED"
             };
 
             tenderStore.set(id, tender);
+            saveTenderStore();
 
-            // Start slow OCR only after the tender has been saved. This makes
-            // the first upload complete once, instead of requiring repeated
-            // clicks while OCR is still running.
+            // Start slow OCR only after the tender has been saved.
             if (content.ocrPending && Buffer.isBuffer(content.sourceBuffer)) {
               void enrichTenderAfterUpload(tender, file, content.sourceBuffer);
             }
@@ -12412,22 +12590,44 @@ PDF page count reported by parser: ${maxPages}.
       const failed = results
         .filter((item) => !item.ok);
 
+      const failedRecords = failed.map((item) => ({
+        id: null,
+        status: "ERROR",
+        filename: item.filename,
+        error: item.error || "Tender processing failed."
+      }));
+
+      if (!successful.length) {
+        const errorMsg = failed.map((item) => `${item.filename}: ${item.error}`).join(" | ") || "No tender files could be processed.";
+        return res.status(400).json({
+          success: false,
+          message: errorMsg,
+          error: errorMsg,
+          uploadedCount: 0,
+          failedCount: failed.length,
+          tenders: failedRecords,
+          files: failedRecords
+        });
+      }
+
       const returnedTenders = successful.map((tender) => ({
         ...tender,
+        status: "UPLOADED",
         // Never expose the full tender text in the upload response. The detail
         // endpoint remains the source for the stored document text.
         text: undefined,
         requirementCount: safeArray(tender.requirements).length
       }));
 
+      const allResponseTenders = [...returnedTenders, ...failedRecords];
       const firstTender = returnedTenders[0] || null;
 
       return res.json({
-        success: successful.length > 0,
+        success: true,
         uploadedCount: successful.length,
         failedCount: failed.length,
-        tenders: returnedTenders,
-        files: returnedTenders,
+        tenders: allResponseTenders,
+        files: allResponseTenders,
         // Compatibility aliases used by older/newer App.jsx versions.
         tender: firstTender,
         selectedTender: firstTender,
@@ -12437,7 +12637,7 @@ PDF page count reported by parser: ${maxPages}.
         requirements: firstTender?.requirements || [],
         requirementCount: firstTender?.requirementCount || 0,
         message: successful.length
-          ? "Tender uploaded and source requirements extracted."
+          ? `${successful.length} tender${successful.length === 1 ? "" : "s"} uploaded and ${firstTender?.requirementCount || 0} requirements extracted.`
           : "No tender files could be processed."
       });
     }
@@ -12665,6 +12865,40 @@ PDF page count reported by parser: ${maxPages}.
       }
     );
 
+    app.delete(
+      "/api/tenders/:id",
+      (req, res) => {
+        try {
+          const tenderId = req.params.id;
+          const tender = tenderStore.get(tenderId);
+
+          if (!tender) {
+            return res.status(404).json({
+              success: false,
+              message: "Tender not found in library."
+            });
+          }
+
+          tenderStore.delete(tenderId);
+          saveTenderStore();
+
+          console.log(`[BIDIFI] Tender deleted: ${tenderId} (${tender.name || tender.filename})`);
+
+          return res.json({
+            success: true,
+            message: `Tender "${tender.name || tender.filename || tenderId}" deleted successfully.`,
+            deletedId: tenderId
+          });
+        } catch (error) {
+          console.error("[BIDIFI] Delete tender failed:", error);
+          return res.status(500).json({
+            success: false,
+            message: error?.message || "Failed to delete tender."
+          });
+        }
+      }
+    );
+
     /* ============================================================
        REQUIREMENT EXTRACTION
        ============================================================ */
@@ -12821,6 +13055,7 @@ PDF page count reported by parser: ${maxPages}.
               tender.id,
               tender
             );
+            saveTenderStore();
           }
 
           res.json({

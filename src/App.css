@@ -12064,3 +12064,663 @@ aside.sidebar .userCard strong,
   filter: none !important;
 }
 }
+
+
+/* =====================================================================
+   BIDIFI — FINAL PREMIUM NAVY CONSISTENCY + ALIGNMENT + CONTRAST PASS
+   Appended intentionally so it takes priority over older conflicting rules.
+   Keeps existing component structure, animations, and functionality intact.
+   ===================================================================== */
+
+:root {
+  color-scheme: dark;
+  --sidebar-width: 270px;
+  --bg: #071426;
+  --surface: #0b1d33;
+  --surface-soft: #102640;
+  --text: #edf6ff;
+  --text-soft: #d4e5f6;
+  --muted: #9bb5d0;
+  --primary: #60a5fa;
+  --primary-dark: #3b82f6;
+  --violet: #a78bfa;
+  --cyan: #67e8f9;
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --border: rgba(125, 177, 226, 0.24);
+  --border-soft: rgba(125, 177, 226, 0.14);
+  --shadow-xs: 0 3px 10px rgba(0, 0, 0, 0.16);
+  --shadow-sm: 0 8px 22px rgba(0, 0, 0, 0.20);
+  --shadow-md: 0 16px 38px rgba(0, 0, 0, 0.26);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: #071426 !important;
+  color: #edf6ff;
+}
+
+body {
+  margin: 0;
+  color: #edf6ff !important;
+  background-color: #071426 !important;
+  background-image: radial-gradient(ellipse at top, rgba(26, 69, 115, 0.22), transparent 58%) !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.app,
+.app:not(.publicApp),
+.app.publicApp,
+.publicApp,
+.appShell,
+.appLayout,
+.mainLayout,
+.mainContent,
+.content,
+.pageContent,
+.workspaceContent,
+.blueWorkspacePage,
+.blueWorkspaceContent {
+  color: #edf6ff;
+  background-color: #071426 !important;
+  background-image: none;
+}
+
+/* Consistent dark navy top bars, headers, navigation, and footer */
+header,
+.appHeader,
+.topbar,
+.topBar,
+.navbar,
+.siteHeader,
+.pageTopbar,
+footer,
+.appFooter,
+.siteFooter,
+.footer,
+.globalFooter,
+.pageFooter {
+  color: #eaf4ff !important;
+  background: linear-gradient(135deg, #0b1d33 0%, #0a2039 55%, #0b2947 100%) !important;
+  border-color: rgba(96, 165, 250, 0.22) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16) !important;
+}
+
+/* Premium navy surfaces throughout all workspaces */
+.panel,
+.card,
+.statCard,
+.stat-card,
+.sectionCard,
+.contentCard,
+.widget,
+.modal,
+.dialog,
+.dropdownMenu,
+.popover,
+.reportCard,
+.reportPanel,
+.reportSection,
+.reportKpi,
+.reportKpis > *,
+.reportGrid > *,
+.verificationStats > *,
+.verificationStat,
+.verificationHero,
+.verificationChecklist,
+.emptyVerification,
+.complianceReport,
+.complianceSummary,
+.riskSummary,
+.evidenceCard,
+.requirementCard,
+.requirementsPanel,
+.aiExtractionPanel,
+.workflowPanel,
+.recentPanel,
+.activityPanel,
+.tenderUploadPanel,
+.tenderLibraryPanel,
+.bidderWorkspacePanel {
+  color: #e6f1ff !important;
+  background: linear-gradient(145deg, #0d223b 0%, #0a1b30 100%) !important;
+  background-color: #0b1d33 !important;
+  border-color: rgba(96, 165, 250, 0.20) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16) !important;
+}
+
+/* Keep nested wrappers from introducing unexpected white blocks */
+.panel > .panelHeader,
+.panelHeader,
+.cardHeader,
+.sectionHeader,
+.reportHeader,
+.reportSectionHeader,
+.tableHeader,
+.tableToolbar,
+.aiExtractionHeader,
+.aiExplanation,
+.requirementHeader,
+.evidenceHeader {
+  color: #e6f1ff !important;
+  background-color: transparent !important;
+  border-color: rgba(96, 165, 250, 0.16) !important;
+}
+
+/* Legible text hierarchy. Avoid overriding semantic status badges. */
+.app h1,
+.app h2,
+.app h3,
+.app h4,
+.app h5,
+.app h6,
+.publicApp h1,
+.publicApp h2,
+.publicApp h3,
+.publicApp h4,
+.pageHeader h1,
+.pageHeader h2,
+.panel h2,
+.panel h3,
+.panelHeader h3,
+.reportCard h2,
+.reportCard h3,
+.reportSection h2,
+.reportSection h3 {
+  color: #f4f9ff !important;
+  -webkit-text-fill-color: #f4f9ff;
+  text-shadow: none;
+}
+
+.app p,
+.app li,
+.app label,
+.app td,
+.app th,
+.app small,
+.app span,
+.app strong,
+.app b,
+.publicApp p,
+.publicApp li,
+.publicApp label,
+.publicApp small,
+.pageHeader p,
+.panel p,
+.panel label,
+.panel small,
+.reportCard p,
+.reportCard span,
+.reportSection p,
+.reportSection span {
+  text-shadow: none;
+}
+
+.app p,
+.app li,
+.app label,
+.app td,
+.app th,
+.app p span,
+.app .description,
+.app .helperText,
+.app .subtext,
+.app .muted,
+.app .meta,
+.app .metadata,
+.publicApp p,
+.pageHeader p,
+.panel p,
+.panel label,
+.panel small,
+.reportCard p,
+.reportSection p {
+  color: #b9cde2 !important;
+}
+
+.app strong,
+.app b,
+.panel strong,
+.panel b,
+.reportCard strong,
+.reportSection strong,
+.statCard strong {
+  color: #edf6ff !important;
+}
+
+/* Inputs and searchable fields: readable placeholder and focus states */
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  color: #edf6ff !important;
+  background-color: #081a2e !important;
+  border-color: rgba(125, 177, 226, 0.30) !important;
+  caret-color: #67e8f9;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8ca8c6 !important;
+  opacity: 1 !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+[contenteditable="true"]:focus {
+  outline: 2px solid rgba(96, 165, 250, 0.42) !important;
+  outline-offset: 1px;
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+}
+
+option {
+  color: #edf6ff;
+  background: #0b1d33;
+}
+
+/* Buttons remain clear and balanced without changing their functionality */
+button,
+.button,
+.primaryButton,
+.secondaryButton,
+.aiButton,
+.textButton {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #67e8f9 !important;
+  outline-offset: 3px !important;
+}
+
+/* Symmetric page headers, spacing, grids and cards */
+.content,
+.pageContent,
+.workspaceContent,
+.blueWorkspaceContent,
+.mainContent {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.pageHeader {
+  width: 100%;
+  box-sizing: border-box;
+  gap: 16px;
+  margin: 0 auto 24px;
+}
+
+.pageHeader > div:first-child {
+  min-width: 0;
+}
+
+.pageHeader p {
+  max-width: 760px;
+  line-height: 1.7 !important;
+}
+
+.dashboardColumns,
+.reportGrid,
+.reportKpis,
+.verificationStats,
+.dashboardStats,
+.statsGrid,
+.workspaceGrid,
+.evidenceGrid,
+.requirementsGrid {
+  align-items: stretch;
+  min-width: 0;
+}
+
+.dashboardColumns > *,
+.reportGrid > *,
+.reportKpis > *,
+.verificationStats > *,
+.dashboardStats > *,
+.statsGrid > *,
+.workspaceGrid > *,
+.evidenceGrid > *,
+.requirementsGrid > * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.panel,
+.reportCard,
+.reportSection,
+.statCard,
+.verificationStat {
+  min-width: 0;
+  box-sizing: border-box;
+  border-radius: 16px;
+  overflow-wrap: anywhere;
+}
+
+/* Tender requirements and bidder evidence comparison report */
+.evidenceRow {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  color: #e6f1ff !important;
+  background: #0a1b30 !important;
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.evidenceRow .evidenceRequirement,
+.evidenceRow .evidenceMatch {
+  min-width: 0;
+  box-sizing: border-box !important;
+  align-self: stretch !important;
+  margin: 0 !important;
+  padding: 16px 18px !important;
+  color: #e6f1ff !important;
+  background: transparent !important;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.6;
+}
+
+.evidenceRow .evidenceRequirement {
+  border-right: 1px solid rgba(125, 177, 226, 0.28) !important;
+}
+
+.evidenceRow .evidenceMatch {
+  border-left: 0 !important;
+}
+
+.evidenceRow .evidenceRequirement :is(h1,h2,h3,h4,strong,b),
+.evidenceRow .evidenceMatch :is(h1,h2,h3,h4,strong,b) {
+  color: #f4f9ff !important;
+}
+
+.evidenceRow .evidenceRequirement :is(p,span,small,li),
+.evidenceRow .evidenceMatch :is(p,span,small,li) {
+  color: #c2d5e9 !important;
+}
+
+/* Reports, match results, compliance metrics and risk summaries */
+.reportGrid,
+.reportKpis,
+.verificationStats {
+  gap: 16px;
+}
+
+.reportGrid > *,
+.reportKpis > *,
+.verificationStats > *,
+.reportCard,
+.reportSection,
+.complianceReport,
+.complianceSummary,
+.riskSummary {
+  background: linear-gradient(145deg, #0d223b, #091a2e) !important;
+  color: #e6f1ff !important;
+  border: 1px solid rgba(96, 165, 250, 0.20) !important;
+}
+
+.reportCard :is(h1,h2,h3,h4,strong,b),
+.reportSection :is(h1,h2,h3,h4,strong,b),
+.complianceReport :is(h1,h2,h3,h4,strong,b),
+.complianceSummary :is(h1,h2,h3,h4,strong,b),
+.riskSummary :is(h1,h2,h3,h4,strong,b) {
+  color: #f4f9ff !important;
+}
+
+.reportCard :is(p,span,small,label,li),
+.reportSection :is(p,span,small,label,li),
+.complianceReport :is(p,span,small,label,li),
+.complianceSummary :is(p,span,small,label,li),
+.riskSummary :is(p,span,small,label,li) {
+  color: #c2d5e9 !important;
+}
+
+/* Tables: dark header, readable rows, visible borders */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: #e6f1ff !important;
+  background: #0b1d33 !important;
+}
+
+thead,
+thead tr,
+th {
+  color: #edf6ff !important;
+  background: #102b49 !important;
+  border-color: rgba(125, 177, 226, 0.24) !important;
+}
+
+tbody,
+tbody tr,
+td {
+  color: #d7e7f7 !important;
+  background-color: #0b1d33 !important;
+  border-color: rgba(125, 177, 226, 0.16) !important;
+}
+
+tbody tr:nth-child(even) td {
+  background-color: #0d223b !important;
+}
+
+tbody tr:hover td {
+  background-color: #12304f !important;
+}
+
+/* Scroll areas should not show bright/white surfaces */
+pre,
+code,
+pre code,
+.logPanel,
+.codePanel,
+.consolePanel {
+  color: #d9eaff;
+  background: #071426;
+  border-color: rgba(125, 177, 226, 0.20);
+}
+
+/* Logos and icons stay visible without applying destructive filters */
+.app svg,
+.publicApp svg,
+header svg,
+footer svg {
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+img,
+.logo,
+.brandLogo,
+.bidifiLogo,
+.brandMark {
+  max-width: 100%;
+}
+
+/* Sidebar matches the same navy system */
+aside.sidebar,
+.sidebar {
+  color: #d8e9fa !important;
+  background: linear-gradient(180deg, #08182b 0%, #071426 100%) !important;
+  border-color: rgba(96, 165, 250, 0.18) !important;
+}
+
+/* Footer layout: aligned columns, links and legible legal copy */
+:is(footer,.appFooter,.siteFooter,.footer,.globalFooter,.pageFooter) {
+  box-sizing: border-box;
+  width: 100%;
+  color: #c6d9ec !important;
+  border-top: 1px solid rgba(96, 165, 250, 0.22) !important;
+}
+
+:is(footer,.appFooter,.siteFooter,.footer,.globalFooter,.pageFooter) a {
+  color: #8fc5ff !important;
+  text-decoration-color: rgba(143, 197, 255, 0.5);
+}
+
+:is(footer,.appFooter,.siteFooter,.footer,.globalFooter,.pageFooter) a:hover {
+  color: #c4e5ff !important;
+}
+
+/* Keep status meaning intact but make badge text readable */
+:is(.statusBadge,.StatusBadge,.badge,.statusPill,.statusTag,.complianceBadge,.riskBadge) {
+  font-weight: 750;
+  line-height: 1.35;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+:is(.statusBadge,.StatusBadge,.badge,.statusPill,.statusTag,.complianceBadge,.riskBadge) :is(span,strong,b) {
+  color: inherit;
+  -webkit-text-fill-color: currentColor;
+}
+
+/* Responsive symmetry: stack comparison columns on narrow screens */
+@media (max-width: 900px) {
+  .pageHeader {
+    gap: 12px;
+  }
+
+  .dashboardColumns,
+  .reportGrid,
+  .reportKpis,
+  .verificationStats,
+  .dashboardStats,
+  .statsGrid {
+    min-width: 0;
+  }
+
+  .evidenceRow {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .evidenceRow .evidenceRequirement {
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(125, 177, 226, 0.24) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .panel,
+  .reportCard,
+  .reportSection,
+  .statCard,
+  .verificationStat {
+    border-radius: 13px;
+  }
+
+  .evidenceRow .evidenceRequirement,
+  .evidenceRow .evidenceMatch {
+    padding: 13px 14px !important;
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Accessible selection and disabled states */
+::selection {
+  color: #ffffff;
+  background: #1d4ed8;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+/* =========================================
+   BIDIFI — Dashboard Header Text Visibility
+   ========================================= */
+
+/* Search workspace placeholder */
+input[placeholder="Search workspace..."],
+input[placeholder*="Search workspace"] {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  caret-color: #000000 !important;
+}
+
+input[placeholder="Search workspace..."]::placeholder,
+input[placeholder*="Search workspace"]::placeholder {
+  color: #000000 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* Top header: logged-in user name and account text */
+header button,
+header button span,
+header [role="button"],
+header [role="button"] span {
+  color: #000000 !important;
+}
+
+/* Notification bell icon */
+header button svg,
+header [role="button"] svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+/* Left sidebar: Krishna and Administrator */
+aside,
+aside span,
+aside p,
+aside h1,
+aside h2,
+aside h3,
+aside [class*="user"],
+aside [class*="User"],
+aside [class*="profile"],
+aside [class*="Profile"] {
+  color: #000000 !important;
+}
+
+/* Keep the account text visible */
+aside [class*="admin"],
+aside [class*="Admin"],
+aside [class*="role"],
+aside [class*="Role"] {
+  color: #000000 !important;
+}
+
+/* Header and sidebar SVG icons */
+aside svg {
+  stroke: #000000 !important;
+}
+
+/* Preserve visibility when hovering */
+header button:hover,
+header button:hover span,
+aside button:hover,
+aside button:hover span {
+  color: #000000 !important;
+}
+
+/* BIDIFI: Make only the logged-in name / Guest User black */
+html body .app > aside.sidebar .profile > div > strong {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
